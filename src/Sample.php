@@ -1,6 +1,6 @@
 <?php
 
-namespace aarpon\hrm;
+namespace hrm\libs;
  
 class Sample {
 

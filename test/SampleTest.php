@@ -1,6 +1,6 @@
 <?php
 
-use aarpon\hrm\Sample;
+use hrm\libs\Sample;
 
 class SampleTest extends PHPUnit_Framework_TestCase {
 
