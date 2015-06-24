@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<database name="hrm" defaultIdMethod="native">
+<database name="hrm_ng" defaultIdMethod="native">
     <table name="user" phpName="User" namespace="hrm">
         <column name="id"             namespace="DB" type="integer"            required="true" primaryKey="true" autoIncrement="true"/>
         <column name="name"           namespace="DB" type="varchar" size="255" required="true" />
