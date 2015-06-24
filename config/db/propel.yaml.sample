@@ -1,7 +1,7 @@
 propel:
   database:
       connections:
-          hrm:
+          hrm_ng:
               user: <set_your_db_username>
               password: <set_your_db_password>
 
