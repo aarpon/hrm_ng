@@ -1,14 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database name="hrm_ng" defaultIdMethod="native">
     <table name="user" phpName="User" namespace="hrm">
-        <column name="id"             namespace="DB" type="integer"            required="true" primaryKey="true" autoIncrement="true"/>
-        <column name="name"           namespace="DB" type="varchar" size="255" required="true" />
-        <column name="password"       namespace="DB" type="varchar" size="255" required="true" />
-        <column name="email"          namespace="DB" type="varchar" size="255" required="true" />
-        <column name="research_group" namespace="DB" type="varchar" size="255" required="true" />
-        <column name="role"           namespace="DB" type="varchar" size="255" required="true" />
-        <column name="creation_date"  namespace="DB" type="date"               required="true" />
-        <column name="last_access"    namespace="DB" type="date"               required="true" />
-        <column name="status"         namespace="DB" type="varchar" size="1"   required="true" />
+        <column name="id"
+                type="integer"
+                required="true"
+                primaryKey="true"
+                autoIncrement="true" />
+        <column name="name"
+                type="varchar"
+                size="255"
+                required="true" />
+        <column name="password"
+                type="varchar"
+                size="255"
+                required="false" />
+        <column name="email"
+                type="varchar"
+                size="255"
+                required="true" />
+        <column name="research_group"
+                type="varchar"
+                size="255"
+                required="true" />
+        <column name="role"
+                type="enum"
+                valueSet="admin,manager,user"
+                required="true" />
+        <column name="creation_date"
+                type="timestamp"
+                required="true" />
+        <column name="last_access"
+                type="timestamp"
+                required="true" />
+        <column name="status"
+                type="enum"
+                valueSet="active,disabled,requested"
+                required="true" />
     </table>
 </database>
