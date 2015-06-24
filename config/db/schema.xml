@@ -29,7 +29,7 @@
         <column name="creation_date"
                 type="timestamp"
                 required="true" />
-        <column name="last_access"
+        <column name="last_access_date"
                 type="timestamp"
                 required="true" />
         <column name="status"

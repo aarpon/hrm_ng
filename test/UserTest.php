@@ -14,4 +14,26 @@ class UserTest extends PHPUnit_Framework_TestCase {
         $this->assertTrue($user !== null);
     }
 
+    /**
+     * Test adding a user to the database.
+     */
+    public function testAddUser()
+    {
+        # Create user
+        $user = new \hrm\User();
+
+        # Set all properties
+        $user->setName("TestUser");
+        $user->setPassword("TestPassword");
+        $user->setEmail("test@email.com");
+        $user->setResearchGroup("TestGroup");
+        $user->setRole("user");
+        $user->setCreationDate(new DateTime());
+        $user->setLastAccessDate(new DateTime());
+        $user->setStatus("active");
+
+        # Save user
+        $this->assertTrue($user->save() > 0);
+
+    }
 }
