@@ -7,8 +7,8 @@
         <column name="email"          namespace="DB" type="varchar" size="255" required="true" />
         <column name="research_group" namespace="DB" type="varchar" size="255" required="true" />
         <column name="role"           namespace="DB" type="varchar" size="255" required="true" />
-        <column name="creation_date"  namespace="DB" type="date"    size="255" required="true" />
-        <column name="last_access"    namespace="DB" type="date"    size="255" required="true" />
+        <column name="creation_date"  namespace="DB" type="date"               required="true" />
+        <column name="last_access"    namespace="DB" type="date"               required="true" />
         <column name="status"         namespace="DB" type="varchar" size="1"   required="true" />
     </table>
 </database>
