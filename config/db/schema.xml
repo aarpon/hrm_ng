@@ -1,40 +1,148 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database name="hrm_ng" defaultIdMethod="native">
-    <table name="user" phpName="User" namespace="hrm">
+
+
+    <!-- Table: user -->
+    <table name="user"
+           phpName="User"
+           namespace="hrm">
+
+        <!-- Id : primary key -->
         <column name="id"
                 type="integer"
                 required="true"
                 primaryKey="true"
-                autoIncrement="true" />
+                autoIncrement="true"/>
+
+        <!-- Name -->
         <column name="name"
                 type="varchar"
                 size="255"
-                required="true" />
+                required="true"/>
+
+        <!-- Password -->
         <column name="password"
                 type="varchar"
                 size="255"
-                required="false" />
+                required="false"/>
+
+        <!-- E-mail -->
         <column name="email"
                 type="varchar"
                 size="255"
-                required="true" />
+                required="true"/>
+
+        <!-- Research group
+
+        Please note: at least in MySQL (MariaDB), a column
+                     cannot be called 'group'!
+        -->
         <column name="research_group"
                 type="varchar"
                 size="255"
-                required="true" />
+                required="true"/>
+
+        <!-- Authentication mechanism
+
+         One of:
+            - integrated : HRM integrated user management
+            - active_dir : Microsoft Active Directory
+            - ldap       : generic LDAP
+         -->
+        <column name="authentication"
+                type="enum"
+                valueSet="integrated,active_dir,ldap"
+                required="true"/>
+
+        <!-- User role
+
+         One of:
+            - admin   : HRM administrator (full power)
+            - manager : facility manager
+            - user    : standard user
+         -->
         <column name="role"
                 type="enum"
                 valueSet="admin,manager,user"
-                required="true" />
+                required="true"/>
+
+        <!-- User creation date -->
         <column name="creation_date"
                 type="timestamp"
-                required="true" />
+                required="true"/>
+
+        <!-- Last access date -->
         <column name="last_access_date"
                 type="timestamp"
-                required="true" />
+                required="true"/>
+
+        <!-- User status
+
+         One of:
+            - active    : active user, can log in
+            - disabled  : user is disabled, cannot log in
+            - requested : user request, to be accepted by
+                          an admin or manager.
+         -->
         <column name="status"
                 type="enum"
                 valueSet="active,disabled,requested"
-                required="true" />
+                required="true"/>
     </table>
+
+    <!-- Table: template
+
+        Foreign key: user
+
+        Single Table Inheritance
+          Base class: Template
+          - ImageTemplate (key = 1) extends Template
+          - RestorationTemplate (key = 2) extends Template
+          - AnalysisTemplate (key = 3) extends Template
+    -->
+    <table name="template"
+           phpName="Template"
+           namespace="hrm">
+
+        <!-- Id : primary key -->
+        <column name="id"
+                type="integer"
+                primaryKey="true"
+                autoIncrement="true"/>
+
+        <!-- Template ID
+
+            Foreign key: user ID
+         -->
+        <column name="template_id"
+                type="integer" />
+        <foreign-key foreignTable="user"
+                     phpName="User"
+                     refPhpName="Template">
+            <reference local="template_id"
+                       foreign="id"/>
+        </foreign-key>
+
+        <!-- Extending class key
+
+        Base class: Template
+          - ImageTemplate (key = 1) extends Template
+          - RestorationTemplate (key = 2) extends Template
+          - AnalysisTemplate (key = 3) extends Template
+        -->
+        <column name="class_key"
+                type="INTEGER"
+                inheritance="single">
+            <inheritance key="1"
+                         class="ImageTemplate"
+                         extends="Template"/>
+            <inheritance key="2"
+                         class="RestorationTemplate"
+                         extends="Template"/>
+            <inheritance key="3"
+                         class="AnalysisTemplate"
+                         extends="Template"/>
+        </column>
+    </table>
+
 </database>
