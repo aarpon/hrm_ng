@@ -88,6 +88,15 @@
                 type="enum"
                 valueSet="active,disabled,requested"
                 required="true"/>
+
+        <!-- Make the 'name' column unique
+
+        TODO: Check that the size argument is compatible with PostgreSQL.
+        -->
+        <unique name="UserName">
+            <unique-column name="name" size="255" />
+        </unique>
+
     </table>
 
     <!-- Table: template
