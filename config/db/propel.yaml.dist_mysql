@@ -1,0 +1,20 @@
+propel:
+  database:
+      connections:
+          hrm_ng:
+              adapter: mysql
+              settings:
+                charset: utf8
+                queries:
+                  utf8: "SET NAMES utf8 COLLATE utf8_unicode_ci, COLLATION_CONNECTION = utf8_unicode_ci, COLLATION_DATABASE = utf8_unicode_ci, COLLATION_SERVER = utf8_unicode_ci"
+              classname: Propel\Runtime\Connection\ConnectionWrapper
+              dsn: "mysql:host=localhost;dbname=hrm_ng"
+              attributes:
+  runtime:
+      defaultConnection: hrm_ng
+      connections:
+          - hrm_ng
+  generator:
+      defaultConnection: hrm_ng
+      connections:
+          - hrm_ng
