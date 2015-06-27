@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "40d8fbf57399026681d4e7c5ff067382",
+    "hash": "ac93e97f8042c1db778fc4af98177036",
     "packages": [
         {
             "name": "adambrett/shell-wrapper",
@@ -172,16 +172,16 @@
         },
         {
             "name": "propel/propel",
-            "version": "2.0.0-alpha4",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/propelorm/Propel2.git",
-                "reference": "8666ef48087fa51aebde2c88be18e819eac43aaf"
+                "reference": "75f775cf6de41595d1240885eea5fa5d475d228d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/8666ef48087fa51aebde2c88be18e819eac43aaf",
-                "reference": "8666ef48087fa51aebde2c88be18e819eac43aaf",
+                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/75f775cf6de41595d1240885eea5fa5d475d228d",
+                "reference": "75f775cf6de41595d1240885eea5fa5d475d228d",
                 "shasum": ""
             },
             "require": {
@@ -233,7 +233,7 @@
                 "orm",
                 "persistence"
             ],
-            "time": "2014-11-20 10:30:31"
+            "time": "2015-06-27 11:58:48"
         },
         {
             "name": "psr/log",
@@ -1565,7 +1565,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "propel/propel": 15
+        "propel/propel": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

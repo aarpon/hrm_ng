@@ -15,7 +15,7 @@
   ],
   "require": {
     "php": ">5.4.0",
-    "propel/propel": "2.0.0-alpha4",
+    "propel/propel": "~2.0@dev",
     "adldap/adldap": "4.0.2",
     "monolog/monolog": "1.14.0",
     "adambrett/shell-wrapper": "0.5.0"
