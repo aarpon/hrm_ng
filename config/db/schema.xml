@@ -3,7 +3,7 @@
 
 
     <!-- Table: user -->
-    <table name="user"
+    <table name="userdata"
            phpName="User"
            namespace="hrm">
 
@@ -125,7 +125,7 @@
          -->
         <column name="template_id"
                 type="integer" />
-        <foreign-key foreignTable="user"
+        <foreign-key foreignTable="userdata"
                      phpName="User"
                      refPhpName="Template">
             <reference local="template_id"
