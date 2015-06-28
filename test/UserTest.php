@@ -9,7 +9,8 @@
 // Bootstrap
 require_once dirname(__FILE__) . '/../src/bootstrap.php';
 
-class UserTest extends PHPUnit_Framework_TestCase {
+class UserTest extends PHPUnit_Framework_TestCase
+{
 
     /**
      * @var userID: the ID we will be using in the test,
