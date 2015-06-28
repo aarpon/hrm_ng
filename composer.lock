@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "ac93e97f8042c1db778fc4af98177036",
+    "hash": "6de5bdc07b7e791fa15f1b8672ee9fef",
     "packages": [
         {
             "name": "adambrett/shell-wrapper",
@@ -1570,7 +1570,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">5.4.0"
+        "php": ">5.5.0"
     },
     "platform-dev": []
 }
