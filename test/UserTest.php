@@ -113,8 +113,7 @@ class UserTest extends PHPUnit_Framework_TestCase
      */
     public function testRetrieveUserByName()
     {
-        # Create a UserQuery to retrieve a collection
-        # of all User objects
+        # Create a UserQuery to retrieve the User by name.
         $user = \hrm\UserQuery::create()->findByName("TestUser");
         $this->assertTrue($user->count() == 1);
     }
