@@ -115,18 +115,8 @@ class UserTest extends PHPUnit_Framework_TestCase
     {
         # Create a UserQuery to retrieve a collection
         # of all User objects
-        $users= \hrm\UserQuery::create()->find();
-
-        # Look for the user we just added.
-        foreach ($users as $user) {
-            if ($user->getPrimaryKey() == $this->userID) {
-                # Check the name
-                $this->assertTrue(
-                    ($user->getName() == "TestUser") &&
-                    ($user->getStatus() == "active"));
-            }
-        }
-
+        $user = \hrm\UserQuery::create()->findByName("TestUser");
+        $this->assertTrue($user->count() == 1);
     }
 
     /**
