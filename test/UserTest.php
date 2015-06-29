@@ -58,7 +58,7 @@ class UserTest extends PHPUnit_Framework_TestCase
 
         # Set all properties
         $user->setName("TestUser");
-        $user->setPassword("TestPassword");
+        $user->setPasswordHash("TestPassword");
         $user->setEmail("test@email.com");
         $user->setResearchGroup("TestGroup");
         $user->setAuthentication("active_dir");
@@ -94,7 +94,7 @@ class UserTest extends PHPUnit_Framework_TestCase
 
         # Set all properties (the name is the same)
         $user->setName("TestUser");
-        $user->setPassword("DifferentPassword");
+        $user->setPasswordHash("DifferentPassword");
         $user->setEmail("different@email.com");
         $user->setResearchGroup("differentGroup");
         $user->setAuthentication("ldap");

@@ -21,7 +21,7 @@
                 required="true"/>
 
         <!-- Password -->
-        <column name="password"
+        <column name="password_hash"
                 type="varchar"
                 size="255"
                 required="false"/>
