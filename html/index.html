@@ -40,8 +40,9 @@
                 $scope.sendData = function() {
                     $http({
                         method  : 'POST',
-                        url     : 'process.php',
-                        data    : ($scope.master),  // pass in data as strings
+                        url     : 'ajax/json-rpc-server.php',
+                        data    : ( method:"login",
+                                    params:$scope.master),  // pass in data as strings
                         headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
                     })
                             .success(function(data) {
