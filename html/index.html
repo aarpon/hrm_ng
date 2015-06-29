@@ -41,9 +41,11 @@
                     $http({
                         method  : 'POST',
                         url     : 'ajax/json-rpc-server.php',
-                        data    : ( method:"login",
-                                    params:$scope.master),  // pass in data as strings
-                        headers : { 'Content-Type': 'application/x-www-form-urlencoded' }  // set the headers so angular passing info as form data (not request payload)
+                        data    : {id : 1,
+                                   jsonrpc: "2.0",
+                                   method : "login",
+                                   params : $scope.user},  // pass in data as strings
+                        headers : {'Content-Type': 'application/json'}  // set the headers so angular passing info as form data (not request payload)
                     })
                             .success(function(data) {
                                 console.log(data);

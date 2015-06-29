@@ -10,7 +10,7 @@ This is an example Javascript code to interface with json-rpc-server.php:
 02:        $(document).ready($('#button').click(function() {
 03:            JSONRPCRequest({
 04:                method : 'isLoggedIn',
-05:                params : { userName : 'name'}
+05:                params : {userName : 'name'}
 06:            }, function(data) {
 07:                $('#report').html("<b>" + data['result'] + "</b>");
 08:            });
@@ -60,6 +60,9 @@ require_once dirname(__FILE__) . '/../../src/bootstrap.php';
 // This is needed when checking the (session) id submitted by the client.
 session_start();
 
+// Retrieve the POSTed data
+$ajaxRequest = json_decode(file_get_contents("php://input"));
+
 // TODO: At this stage we filter the actions that are allowed depending on
 // TODO: the login status and role of the User.
 
@@ -74,41 +77,42 @@ session_start();
 //
 // ============================================================================
 
-// Check that we have a valid request
-if (!isset($_POST)) {
-    die("Nothing POSTed!");
-}
+// TODO: Check that we have a valid request
 
 // Do we have a JSON-RPC 2.0 request? TODO: check id!
-if (!(isset($_POST['id']) &&
-    isset($_POST['jsonrpc']) && $_POST['jsonrpc'] == "2.0")) {
+if (!(isset($ajaxRequest['id']) &&
+    isset($ajaxRequest['jsonrpc']) && $ajaxRequest['jsonrpc'] == "2.0")) {
 
     // Invalid JSON-RPC 2.0 call
     die("Invalid JSON-RPC 2.0 call.");
 };
 
 // Do we have a method with params?
-if (!isset($_POST['method']) && !isset($_POST['params'])) {
+if (!isset($ajaxRequest['method']) && !isset($ajaxRequest['params'])) {
 
     // Expected 'method' and 'params'
     die("Expected 'method' and 'params'.");
 }
 
 // Get the method
-$method = $_POST['method'];
+$method = $ajaxRequest['method'];
 
 // Method parameters
 $params = null;
-if (isset($_POST['params'])) {
-    $params = $_POST['params'];
+if (isset($ajaxRequest['params'])) {
+    $params = $ajaxRequest['params'];
 }
 
-// Call the requested method and collect the JSON-encoded response
 switch ($method) {
 
     case "login":
 
-        $json = login($params);
+        $json = login($params["username"], $params["password"]);
+        break;
+
+    case "isLoggedIn":
+
+        $json = isLoggedIn($params["id"], $params["username"]);
         break;
 
     default:
@@ -154,16 +158,16 @@ return true;
  * @return Array (PHP) with "id" => <passed id>, "result" => "",
  *         "success" => "true" and "message" => "" properties.
  */
-function initJSONArray($client_id)
+function initJSONArray()
 {
     // TODO: Validate id
 
     // Initialize the JSON array with success
     return (array(
-        "id" => $client_id,
-        "result" => "",
-        "success" => true,
-        "message" => ""));
+            "id" => -1,
+            "result" => "",
+            "success" => true,
+            "message" => ""));
 }
 
 /**
@@ -173,10 +177,37 @@ function initJSONArray($client_id)
  * @param $client_id: id obtained from the client.
  * @return bool True if login was successful, false otherwise.
  */
-function login($client_id) {
+function login($username, $password) {
 
     // Initialize output JSON array
-    $json = initJSONArray($client_id);
+    $json = initJSONArray();
+
+    // Initialize a new User
+    $user = new User();
+
+    // TODO: Actually login the user.
+    $result = false;
+    if ($user->login()) {
+        $result = true;
+    }
+    $json["result"] = $result;
+
+    // Return as a JSON string
+    return (json_encode($json));
+}
+
+/**
+ * Checks whether the user with given user name is logged in
+ * the result.
+ *
+ * @param $client_id: session id obtained from the client.
+ * @param $username: name of the user to test for log in status.
+ * @return bool True if the user is logged in, false otherwise.
+ */
+function isLoggedIn($client_id, $username) {
+
+    // Initialize output JSON array
+    $json = initJSONArray();
 
     // Initialize a new User
     $user = new User();
