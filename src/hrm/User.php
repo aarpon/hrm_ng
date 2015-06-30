@@ -21,22 +21,6 @@ class User extends BaseUser
     protected $authenticator = null;
 
     /**
-     * @var bool Flag to indicate whether the user is currently logged in.
-     */
-    protected $isLoggedIn = false;
-
-    /**
-     * Return the login status of the User.
-     *
-     * @return bool True if the user is logged in, false otherwise.
-     */
-    public function isLoggedIn()
-    {
-        // Return the isLoggedIn flag
-        return $this->isLoggedIn;
-    }
-
-    /**
      * Attempts to login the User.
      * @param $password String Password to be checked for current User.
      * @return bool True if the login succeeded, false otherwise.
@@ -62,19 +46,17 @@ class User extends BaseUser
         $this->authenticator = AuthenticatorFactory::getAuthenticator($auth);
 
         // Authenticate the User against the selected mechanism
-        $this->isLoggedIn = $this->authenticator->authenticate(
-                $this->getName(), $password);
+        $result = $this->authenticator->authenticate($this->getName(), $password);
 
         // Update the last access date for a successful login
-        if ($this->isLoggedIn == true) {
+        if ($result == true) {
             $this->setLastAccessDate(new \DateTime());
 
             // Store the change in the database
             $this->save();
         }
 
-        // Return current login status
-        return $this->isLoggedIn;
+        return $result;
     }
 
     /**
