@@ -196,9 +196,9 @@ function login($username, $password) {
     if (null === $user) {
 
         // The User does not exist!
-        $json['success'] = false;
-        $json['message'] = "The user does not exist.";
-        return $json;
+        $json["success"] = false;
+        $json["message"] = "The user does not exist.";
+        return json_encode($json);
 
     }
 
@@ -220,6 +220,7 @@ function login($username, $password) {
     } else {
 
         // Fill the json array
+        $
         $json["result"] = false;
         $json["success"] = true;
         $json["message"] = "The user could not be logged in.";

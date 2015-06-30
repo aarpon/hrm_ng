@@ -48,7 +48,6 @@
                         headers : {'Content-Type': 'application/json'}  // set the headers so angular passing info as form data (not request payload)
                     })
                             .success(function(data) {
-                                console.log("HI");
                                 console.log(data);
 
                                 $scope.message = data.message;
