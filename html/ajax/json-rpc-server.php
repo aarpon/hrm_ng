@@ -62,6 +62,9 @@ session_start();
 
 // Retrieve the POSTed data
 $ajaxRequest = json_decode(file_get_contents("php://input"));
+if (null === $ajaxRequest) {
+    die("Nothing POSTed!");
+}
 
 // TODO: At this stage we filter the actions that are allowed depending on
 // TODO: the login status and role of the User.
@@ -86,6 +89,10 @@ if (!(isset($ajaxRequest['id']) &&
     // Invalid JSON-RPC 2.0 call
     die("Invalid JSON-RPC 2.0 call.");
 };
+
+// Start the session with passed key
+$session_id = $_POST['id'];
+session_start($session_id);
 
 // Do we have a method with params?
 if (!isset($ajaxRequest['method']) && !isset($ajaxRequest['params'])) {
@@ -143,6 +150,7 @@ return true;
  *
  * "id"     : id received from the client. Following the JSON RPC 2.0
  *            specifications the received id must be returned to the client.
+ *            The function initializes it to -1 (invalid id).
  * "success": whether the call was successful ("true") or not ("false").
  *            Defaults to "true".
  * "message": typically an error message to be displayed or parsed by the client
@@ -154,8 +162,7 @@ return true;
  * Note: PHP booleans true and false MUST be mapped to the corresponding strings
  * "true" and "false".
  *
- * @param $client_id: id received from the client.
- * @return Array (PHP) with "id" => <passed id>, "result" => "",
+ * @return Array (PHP) with "id" => -1, "result" => "",
  *         "success" => "true" and "message" => "" properties.
  */
 function initJSONArray()
@@ -174,7 +181,8 @@ function initJSONArray()
  * Attempts to login the user with name and password received from the client and return
  * the result.
  *
- * @param $client_id: id obtained from the client.
+ * @param $username String Name of the User
+ * @param $password String Password of the User
  * @return bool True if login was successful, false otherwise.
  */
 function login($username, $password) {
@@ -189,6 +197,9 @@ function login($username, $password) {
     $result = false;
     if ($user->login()) {
         $result = true;
+
+        // TODO: Start the session and store the key
+        // TODO: in the JSON reply
     }
     $json["result"] = $result;
 
@@ -209,14 +220,16 @@ function isLoggedIn($client_id, $username) {
     // Initialize output JSON array
     $json = initJSONArray();
 
-    // Initialize a new User
-    $user = new User();
+    // TODO: Check that the ID exists in the session
 
-    // TODO: Actually login the user.
-    $result = false;
-    if ($user->login()) {
-        $result = true;
+    // Initialize a new User
+    $user = UserQuery::create()->findByName($username);
+    if ($user->count() == 0) {
+        // TODO: Send back failure via JSON
     }
+
+    // Get the User login status
+    $result = $user[0]->isLoggedIn();
     $json["result"] = $result;
 
     // Return as a JSON string
