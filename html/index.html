@@ -6,7 +6,7 @@
 
 
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.1/angular.min.js"></script>
-
+    <script src="ngStorage.min.js"></script>
 
 
 </head>
@@ -27,11 +27,14 @@
 </div>
 <div ng-controller="otherController">
     <input type="button" ng-click="getSomeData()" value="The Button">
+    <pre>userid = {{userid}}</pre>
+    <pre>is Logged in = {{isLoggedinOnServer}}</pre>
+
 </div>
 <script>
-    angular.module('formExample', [])
-            .controller('loginController', function($scope, $http) {
-                $scope.userid = -1;
+    angular.module('formExample', ["ngStorage"])
+            .controller('loginController', function($scope, $http, $localStorage) {
+                $localStorage.userid = -1;
 
                 $scope.reset = function() {
                     $scope.user = {};
@@ -57,21 +60,23 @@
                                     // if not successful, bind errors to error variables
 
                                 } else {
-                                    $scope.userid = data.id;
+                                    $localstorage.userid = data.id;
                                 }
                             });
                 };
 
                 $scope.reset();
             })
-            .controller('otherController', function($scope, $http) {
-                $scope.isLoggedinOnServer = false;
+            .controller('otherController', function($scope, $http, $localStorage) {
+                $scope.isLoggedinOnServer = [];
 
                 $scope.getSomeData = function() {
+                    $scope.userid = $localStorage.userid;
+
                     $http({
                         method  : 'POST',
                         url     : 'ajax/json-rpc-server.php',
-                        data    : {id : $scope.userid,
+                        data    : {id : $localStorage.userid,
                             jsonrpc: "2.0",
                             method : "isLoggedIn",
                             params : {} },  // pass in data as strings
