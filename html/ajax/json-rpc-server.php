@@ -111,7 +111,7 @@ switch ($method) {
             die("Invalid arguments.");
         }
 
-        $json = login($params["username"], $params["password"]);
+        $json = logIn($params["username"], $params["password"]);
         break;
 
     case "isLoggedIn":
@@ -136,6 +136,106 @@ header("Content-Type: application/json", true);
 echo $json;
 
 return true;
+
+// ============================================================================
+//
+// INTERNAL METHODS
+//
+// ============================================================================
+
+/**
+ * This method is used internally to make sure that the session is active
+ * and the User is logged in before any action is performed. If this function
+ * returns that the session is not active (and the User is therefore not logged
+ * in), no method should be executed.
+ *
+ * @param $client_session_id Session ID obtained from the client.
+ * @return array Result array with keys "can_run" (true|false) and "message".
+ *               The message contains a human-friendly explanation of what
+ *               went wrong.
+ */
+function __isSessionActive($client_session_id) {
+
+    // Initialize output
+    $result = array("can_run" => true, "message" => "");
+
+    // Start the session and check that the ID exists in the session
+    start_session();
+    if ($client_session_id != session_id()) {
+
+        // The User is not logged in and there is no active session.
+        $result["can_run"] = false;
+        $result["message"] = "Invalid session id.";
+
+        return $result;
+    }
+
+    // Check that the session has a User ID
+    if (! array_key_exists('UserID', $_SESSION)) {
+
+        // The User ID was not found in the PHP session.
+        $result["can_run"] = false;
+        $json["message"] = "The user does not exist.";
+
+        return $result;
+    }
+
+    return $result;
+}
+
+/**
+ * Checks whether a given method can be run by current User's role.
+ *
+ * This function will not completely validate the session. It just
+ * tries to retrieve the current User from the session and compares
+ * his role to the one hard-coded in this method.
+ *
+ * Before the method is called, the __sessionIsActive() method should
+ * be called to make sure that a session is active at all!
+ *
+ * @param $methodName One of the methods run in this script.
+ * @return bool True if the method can be run, false otherwise.
+ * @throws \Exception It the role returned for the User is not recognized.
+ * @throws \Propel\Runtime\Exception\PropelException
+ */
+function __isMethodAllowed($methodName) {
+
+    // The logIn method can always be run
+    if ($methodName == "logIn") {
+        return true;
+    }
+
+    // Check it the UserID is stored in the session
+    if (array_key_exists('UserID', $_SESSION)) {
+
+        // Try retrieving the user
+        $user = UserQuery::create()->findOneById($_SESSION['UserID']);
+        if (null === $user) {
+            return false;
+        }
+
+        // Get User role
+        $role = $user->getRole();
+        switch ($role) {
+            case "user":    $roleInt = 0; break;
+            case "manager": $roleInt = 1; break;
+            case "admin":   $roleInt = 2; break;
+            default: throw new \Exception("Unknown User role!");
+        }
+
+        // Define the minimum roles
+        $methodRoles = array("addUser" => 3); // TODO: Example!!
+
+        // Compare the role requirements
+        if (array_key_exists($methodName, $methodRoles)) {
+            return ($methodRoles[$methodName] <= $roleInt);
+        } else {
+            return true;
+        }
+    }
+
+    return true;
+}
 
 // ============================================================================
 //
@@ -186,7 +286,7 @@ function initJSONArray()
  * @param $password String Password of the User
  * @return array JSON array.
  */
-function login($username, $password) {
+function logIn($username, $password) {
 
     // Initialize output JSON array
     $json = initJSONArray();
@@ -205,7 +305,11 @@ function login($username, $password) {
     // Try authenticating the user.
     if ($user->logIn($password)) {
 
-        // Start the session and store the key in
+        // Destroy previous session
+        session_unset();
+        session_destroy();
+
+        // Start the new session and store the key in
         // the JSON reply
         session_start();
 
@@ -215,7 +319,7 @@ function login($username, $password) {
         $json["success"] = true;
 
         // Store the User ID in the PHP session
-        $SESSION['UserID'] = $user->getId();
+        $_SESSION['UserID'] = $user->getId();
 
     } else {
 
@@ -244,50 +348,17 @@ function login($username, $password) {
  * @param $username: name of the User to test for log in status.
  * @return array JSON array.
  */
-function isLoggedIn($client_id, $username) {
+function isLoggedIn($client_session_id) {
 
     // Initialize output JSON array
     $json = initJSONArray();
 
-    // Start the session and check that the ID exists in the session
-    start_session();
-    if ($client_id != session_id()) {
-
-        // The User is not logged in and there is no active session.
+    // Check the session and the User login state
+    $result = __isSessionActive($client_session_id);
+    if (! $result['can_run']) {
         $json["result"] = false;
-        $json["message"] = "Invalid session id.";
-
-        return $json;
+        $json["message"] = $result['message'];
     }
-
-    // Retrieve the requested User
-    $user = UserQuery::create()->findOneByName($username);
-    if (null === $user) {
-
-        // The User was not found.
-        $json["result"] = false;
-        $json["message"] = "The user does not exist.";
-
-        return $json;
-    }
-
-    // Compare the ID
-    if (!(array_key_exists('UserID', $_SESSION)) &&
-            $_SESSION['UserID'] == $user->getId()) {
-
-        // The User was not found in the session.
-        $json["result"] = false;
-        $json["message"] = "The user does not exist in the session.";
-
-        return $json;
-    }
-
-    // Get the User login status
-    $result = $user->isLoggedIn();
-    $json['id'] = session_id(); // This is the same as the passed $client_id
-    $json["result"] = $result;
-    $json["success"] = true;
-    $json["message"] = "";
 
     // Return as a JSON string
     return (json_encode($json));

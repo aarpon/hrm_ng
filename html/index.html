@@ -28,6 +28,7 @@
 <div ng-controller="otherController">
     <input type="button" ng-click="getSomeData()" value="The Button">
     <pre>userid = {{userid}}</pre>
+    <pre>message = {{message}}</pre>
     <pre>is Logged in = {{isLoggedinOnServer}}</pre>
 
 </div>
@@ -35,6 +36,7 @@
     angular.module('formExample', ["ngStorage"])
             .controller('loginController', function($scope, $http, $localStorage) {
                 $localStorage.userid = -1;
+                $scope.userid = $localStorage.userid;
 
                 $scope.reset = function() {
                     $scope.user = {};
@@ -60,7 +62,8 @@
                                     // if not successful, bind errors to error variables
 
                                 } else {
-                                    $localstorage.userid = data.id;
+                                    $localStorage.userid = data.id;
+                                    $scope.userid = data.id;
                                 }
                             });
                 };
@@ -68,9 +71,12 @@
                 $scope.reset();
             })
             .controller('otherController', function($scope, $http, $localStorage) {
-                $scope.isLoggedinOnServer = [];
+                $scope.isLoggedinOnServer = false;
 
                 $scope.getSomeData = function() {
+                    if (! $localStorage.userid) {
+                        $localStorage.userid = -1;
+                    }
                     $scope.userid = $localStorage.userid;
 
                     $http({
