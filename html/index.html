@@ -10,9 +10,11 @@
 
 
 </head>
-<body ng-app="formExample" ng-controller="ExampleController">
-<div>
-    <form novalidate class="simple-form" ng-submit="sendData()">
+<body ng-app="formExample">
+
+
+<div ng-controller="loginController">
+    <form novalidate class="simple-form" ng-submit="loginUser()">
         Name: <input type="text" ng-model="user.username" /><br />
         Password: <input type="password" ng-model="user.password" /><br />
         <input type="button" ng-click="reset()" value="Reset" />
@@ -21,51 +23,76 @@
     <pre>form = {{user | json}}</pre>
     <pre>master = {{master | json}}</pre>
     <pre>message = {{message}}</pre>
+    <pre>userid = {{userid}}</pre>
 </div>
-
+<div ng-controller="otherController">
+    <input type="button" ng-click="getSomeData()" value="The Button">
+</div>
 <script>
     angular.module('formExample', [])
-            .controller('ExampleController', function($scope, $http) {
-                $scope.master = {};
-
-                $scope.update = function(user) {
-                    $scope.master = angular.copy(user);
-                };
+            .controller('loginController', function($scope, $http) {
+                $scope.userid = -1;
 
                 $scope.reset = function() {
-                    $scope.user = angular.copy($scope.master);
+                    $scope.user = {};
                 };
 
-                $scope.sendData = function() {
+                $scope.loginUser = function() {
                     $http({
                         method  : 'POST',
                         url     : 'ajax/json-rpc-server.php',
-                        data    : {id : 1,
+                        data    : {id : $scope.userid,
                                    jsonrpc: "2.0",
                                    method : "login",
-                                   params : $scope.user},  // pass in data as strings
+                                   params : $scope.user },  // pass in data as strings
                         headers : {'Content-Type': 'application/json'}  // set the headers so angular passing info as form data (not request payload)
                     })
                             .success(function(data) {
+                                console.log("HI");
                                 console.log(data);
+
+                                $scope.message = data.message;
+
 
                                 if (!data.success) {
                                     // if not successful, bind errors to error variables
-                                    $scope.message = data.message;
-                                } else {
-                                    // if successful, bind success message to message
-                                    if (data.result) {
-                                        $scope.message = "User successfully logged in!";
-                                    } else {
-                                        $scope.message = data.message;
-                                    }
 
+                                } else {
+                                    $scope.userid = data.id;
                                 }
                             });
                 };
 
                 $scope.reset();
-            });
+            })
+            .controller('otherController', function($scope, $http) {
+                $scope.isLoggedinOnServer = false;
+
+                $scope.getSomeData = function() {
+                    $http({
+                        method  : 'POST',
+                        url     : 'ajax/json-rpc-server.php',
+                        data    : {id : $scope.userid,
+                            jsonrpc: "2.0",
+                            method : "isLoggedIn",
+                            params : {} },  // pass in data as strings
+                        headers : {'Content-Type': 'application/json'}  // set the headers so angular passing info as form data (not request payload)
+                    })
+                            .success(function(data) {
+                                console.log(data);
+
+                                $scope.message = data.message;
+
+
+                                if (!data.success) {
+                                    // if not successful, bind errors to error variables
+
+                                } else {
+                                    $scope.isLoggedinOnServer = data.result;
+                                }
+                            });
+                };
+            })
 </script>
 </body>
 </html>
