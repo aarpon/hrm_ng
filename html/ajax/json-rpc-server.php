@@ -85,6 +85,17 @@ if (!(array_key_exists('jsonrpc', $ajaxRequest) &&
     die("Invalid JSON-RPC 2.0 call.");
 };
 
+// The session ID must be present. If it is not valid, it should be set to -1.
+if (!(array_key_exists('id', $ajaxRequest))) {
+
+    // Session ID missing
+    die("Session ID is missing!");
+
+}
+
+// Retrieve the session ID from the client
+$clientID = $ajaxRequest['id'];
+
 // Do we have a method with params?
 if (!isset($ajaxRequest['method']) && !isset($ajaxRequest['params'])) {
 
@@ -116,13 +127,7 @@ switch ($method) {
 
     case "isLoggedIn":
 
-        // Make sure the expected parameters exist
-        if (!(array_key_exists('id', $params) &&
-                array_key_exists('username', $params))) {
-            die("Invalid arguments.");
-        }
-
-        $json = isLoggedIn($params["id"], $params["username"]);
+        $json = isLoggedIn($clientID);
         break;
 
     default:
@@ -159,8 +164,7 @@ function __isSessionActive($client_session_id) {
     // Initialize output
     $result = array("can_run" => true, "message" => "");
 
-    // Start the session and check that the ID exists in the session
-    start_session();
+    // Check if the ID exists in the session
     if ($client_session_id != session_id()) {
 
         // The User is not logged in and there is no active session.
@@ -338,6 +342,8 @@ function logIn($username, $password) {
  * Checks whether the user with given user name is logged in
  * the result.
  *
+ * TODO: This is a toy example to test the communication client-server.
+ *
  * For this to succeed, the following must be satisfied:
  *
  *    - the client ID must match current PHP session ID
@@ -356,8 +362,21 @@ function isLoggedIn($client_session_id) {
     // Check the session and the User login state
     $result = __isSessionActive($client_session_id);
     if (! $result['can_run']) {
-        $json["result"] = false;
-        $json["message"] = $result['message'];
+        $json['result'] = false;
+        $json['success'] = false;
+        $json['message'] = $result['message'];
+    } else {
+
+        if (! isMethodAllowed("isLoggedIn")) {
+            $json['result'] = false;
+            $json['success'] = false;
+            $json['message'] = "The user is not allowed to perform this operation.";
+        } else {
+            $json['result'] = true;
+            $json['success'] = true;
+            $json['id'] = $client_session_id;
+            $json['message'] = "";
+        }
     }
 
     // Return as a JSON string
