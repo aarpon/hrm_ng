@@ -23,13 +23,10 @@ class IntegratedAuthenticator extends AbstractAuthenticator {
     public function authenticate($username, $password)
     {
         // Retrieve the User from the database by name
-        $users = UserQuery::create()->findByName($username);
-        if ($users->count() == 0) {
+        $user = UserQuery::create()->findOneByName($username);
+        if (null === $user) {
             return false;
         }
-
-        // Get the User from the collection
-        $user = $users[0];
 
         // Retrieve the password from the database
         $passwordHash = $user->getPasswordHash();
