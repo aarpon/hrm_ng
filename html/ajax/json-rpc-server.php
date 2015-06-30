@@ -55,24 +55,21 @@ PHP:          $params[0] := "ExcitationWavelength"
 namespace hrm;
 
 // Bootstrap
+use hrm\Base\UserQuery;
+
 require_once dirname(__FILE__) . '/../../src/bootstrap.php';
 
 // This is needed when checking the (session) id submitted by the client.
 session_start();
 
-// Retrieve the POSTed data
-$ajaxRequest = json_decode(file_get_contents("php://input"));
+// Retrieve the POSTed data and convert to a PHP array
+$ajaxRequest = json_decode(file_get_contents("php://input"), true);
 if (null === $ajaxRequest) {
     die("Nothing POSTed!");
 }
 
-// TODO: At this stage we filter the actions that are allowed depending on
-// TODO: the login status and role of the User.
-
-// If the user is not logged on, we return without doing anything.
-//if (!isset($_SESSION['user']) || !$_SESSION['user']->isLoggedIn()) {
-//    return;
-//}
+// TODO: Actions will need to be filtered (i.e. allowed) depending on the
+// TODO: login status and role of the User.
 
 // ============================================================================
 //
@@ -80,19 +77,13 @@ if (null === $ajaxRequest) {
 //
 // ============================================================================
 
-// TODO: Check that we have a valid request
-
-// Do we have a JSON-RPC 2.0 request? TODO: check id!
-if (!(isset($ajaxRequest['id']) &&
-    isset($ajaxRequest['jsonrpc']) && $ajaxRequest['jsonrpc'] == "2.0")) {
+// Do we have a JSON-RPC 2.0 request?
+if (!(array_key_exists('jsonrpc', $ajaxRequest) &&
+        $ajaxRequest['jsonrpc'] == "2.0")) {
 
     // Invalid JSON-RPC 2.0 call
     die("Invalid JSON-RPC 2.0 call.");
 };
-
-// Start the session with passed key
-$session_id = $_POST['id'];
-session_start($session_id);
 
 // Do we have a method with params?
 if (!isset($ajaxRequest['method']) && !isset($ajaxRequest['params'])) {
@@ -106,7 +97,7 @@ $method = $ajaxRequest['method'];
 
 // Method parameters
 $params = null;
-if (isset($ajaxRequest['params'])) {
+if (array_key_exists('params', $ajaxRequest)) {
     $params = $ajaxRequest['params'];
 }
 
@@ -114,10 +105,22 @@ switch ($method) {
 
     case "login":
 
+        // Make sure the expected parameters exist
+        if (!(array_key_exists('username', $params) &&
+            array_key_exists('password', $params))) {
+            die("Invalid arguments.");
+        }
+
         $json = login($params["username"], $params["password"]);
         break;
 
     case "isLoggedIn":
+
+        // Make sure the expected parameters exist
+        if (!(array_key_exists('id', $params) &&
+                array_key_exists('username', $params))) {
+            die("Invalid arguments.");
+        }
 
         $json = isLoggedIn($params["id"], $params["username"]);
         break;
@@ -141,39 +144,37 @@ return true;
 // ============================================================================
 
 /**
- * Create default (PHP) array with "id", "success" and "message" properties.
+ * Create default (PHP) array with "id", "success", "results" and "message" properties.
  * Methods should initialize their JSON output array with this function, to make
  * sure that there are the expected properties in the returned object (with
  * their default values) and then fill it as needed.
  *
  * The default properties and corresponding values are:
  *
- * "id"     : id received from the client. Following the JSON RPC 2.0
- *            specifications the received id must be returned to the client.
- *            The function initializes it to -1 (invalid id).
- * "success": whether the call was successful ("true") or not ("false").
- *            Defaults to "true".
+ * "id"     : session id. For most operations, this is received from the client. The
+ *            'login' operation (or method) will initialize the (PHP) session and return
+ *            the session id to the client. The client will then use this id for all
+ *            subsequent operations. Following the JSON RPC 2.0 specifications, the id
+ *            received from the client MUST be returned to the client.
+ *            The function initializes it to -1 (invalid session id).
+ * "success": whether the call was successful (boolean true) or not (false).
+ *            Defaults to false.
  * "message": typically an error message to be displayed or parsed by the client
- *            in case "success" is "false".
+ *            in case "success" is false.
  * "result" : encapsulates the actual result from the call.
  *
  * Before the method functions return, they must call json_encode() on it!
  *
- * Note: PHP booleans true and false MUST be mapped to the corresponding strings
- * "true" and "false".
- *
  * @return Array (PHP) with "id" => -1, "result" => "",
- *         "success" => "true" and "message" => "" properties.
+ *         "success" => false and "message" => "" properties.
  */
 function initJSONArray()
 {
-    // TODO: Validate id
-
-    // Initialize the JSON array with success
+    // Initialize the JSON array with failure
     return (array(
             "id" => -1,
             "result" => "",
-            "success" => true,
+            "success" => false,
             "message" => ""));
 }
 
@@ -183,25 +184,46 @@ function initJSONArray()
  *
  * @param $username String Name of the User
  * @param $password String Password of the User
- * @return bool True if login was successful, false otherwise.
+ * @return array JSON array.
  */
 function login($username, $password) {
 
     // Initialize output JSON array
     $json = initJSONArray();
 
-    // Initialize a new User
-    $user = new User();
+    // Query the User
+    $user = UserQuery::create()->findOneByName($username);
+    if (null === $user) {
 
-    // TODO: Actually login the user.
-    $result = false;
-    if ($user->login()) {
-        $result = true;
+        // The User does not exist!
+        $json['success'] = false;
+        $json['message'] = "The user does not exist.";
+        return $json;
 
-        // TODO: Start the session and store the key
-        // TODO: in the JSON reply
     }
-    $json["result"] = $result;
+
+    // Try authenticating the user.
+    if ($user->logIn($password)) {
+
+        // Start the session and store the key in
+        // the JSON reply
+        session_start();
+
+        // Fill the json array
+        $json["id"] = session_id();
+        $json["result"] = true;
+        $json["success"] = true;
+
+        // Store the User ID in the PHP session
+        $SESSION['UserID'] = $user->getId();
+
+    } else {
+
+        // Fill the json array
+        $json["result"] = false;
+        $json["success"] = true;
+        $json["message"] = "The user could not be logged in.";
+    }
 
     // Return as a JSON string
     return (json_encode($json));
@@ -211,26 +233,60 @@ function login($username, $password) {
  * Checks whether the user with given user name is logged in
  * the result.
  *
+ * For this to succeed, the following must be satisfied:
+ *
+ *    - the client ID must match current PHP session ID
+ *    - the PHP session id must contain the User ID
+ *    - $username must match the name of the User stored in the PHP session
+ *
  * @param $client_id: session id obtained from the client.
- * @param $username: name of the user to test for log in status.
- * @return bool True if the user is logged in, false otherwise.
+ * @param $username: name of the User to test for log in status.
+ * @return array JSON array.
  */
 function isLoggedIn($client_id, $username) {
 
     // Initialize output JSON array
     $json = initJSONArray();
 
-    // TODO: Check that the ID exists in the session
+    // Start the session and check that the ID exists in the session
+    start_session();
+    if ($client_id != session_id()) {
 
-    // Initialize a new User
-    $user = UserQuery::create()->findByName($username);
-    if ($user->count() == 0) {
-        // TODO: Send back failure via JSON
+        // The User is not logged in and there is no active session.
+        $json["result"] = false;
+        $json["message"] = "Invalid session id.";
+
+        return $json;
+    }
+
+    // Retrieve the requested User
+    $user = UserQuery::create()->findOneByName($username);
+    if (null === $user) {
+
+        // The User was not found.
+        $json["result"] = false;
+        $json["message"] = "The user does not exist.";
+
+        return $json;
+    }
+
+    // Compare the ID
+    if (!(array_key_exists('UserID', $_SESSION)) &&
+            $_SESSION['UserID'] == $user->getId()) {
+
+        // The User was not found in the session.
+        $json["result"] = false;
+        $json["message"] = "The user does not exist in the session.";
+
+        return $json;
     }
 
     // Get the User login status
-    $result = $user[0]->isLoggedIn();
+    $result = $user->isLoggedIn();
+    $json['id'] = session_id(); // This is the same as the passed $client_id
     $json["result"] = $result;
+    $json["success"] = true;
+    $json["message"] = "";
 
     // Return as a JSON string
     return (json_encode($json));

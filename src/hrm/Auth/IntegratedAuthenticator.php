@@ -1,6 +1,6 @@
 <?php
 
-namespace hrm\auth;
+namespace hrm\Auth;
 
 // Bootstrap
 require_once dirname(__FILE__) . '/../../bootstrap.php';
@@ -15,20 +15,24 @@ class IntegratedAuthenticator extends AbstractAuthenticator {
      * This uses the Password Hashing API available in PHP >= 5.5.
      *
      * @param $username String User name for authentication.
-     * @param $password String Password for authentication.
+     * @param $password String Password for authentication. This will be hashed
+     *                         and compared to the one stored.
      * @return bool True if the authentication succeeded, false otherwise.
      * @throws \Exception if password hashing failed.
      */
     public function authenticate($username, $password)
     {
         // Retrieve the User from the database by name
-        $user = UserQuery::create()->findByName($username);
-        if ($user->count() == 0) {
+        $users = UserQuery::create()->findByName($username);
+        if ($users->count() == 0) {
             return false;
         }
 
+        // Get the User from the collection
+        $user = $users[0];
+
         // Retrieve the password from the database
-        $passwordHash = $user["password_hash"];
+        $passwordHash = $user->getPasswordHash();
         if ($passwordHash == "") {
             // If the password hash is empty or null, return false.
             return false;
@@ -47,15 +51,18 @@ class IntegratedAuthenticator extends AbstractAuthenticator {
                 $currentHashAlgorithm,
                 $currentHashOptions);
         if ($passwordNeedsRehash === true) {
-            // TODO: Check that this is the correct way to store the new password
-            $user["password_hash"] = password_hash(
+            // Update the password hash
+            $user->setPasswordHash(password_hash(
                 $password,
                     $currentHashAlgorithm,
-                    $currentHashOptions);
+                    $currentHashOptions));
 
-            // TODO: Check that the user is complete.
+            // Update the User in the database
             $user->save();
         }
+
+        // Return successful login
+        return true;
     }
 
     /**
@@ -67,7 +74,10 @@ class IntegratedAuthenticator extends AbstractAuthenticator {
     public function getEmailAddress($username)
     {
         // Retrieve the User from the database by name
-        $user = UserQuery::create()->findByName($username);
+        $user = UserQuery::create()->findOneByName($username);
+        if (null === $user) {
+            return "";
+        }
 
         // Return the e-mail address
         return $user["email"];
@@ -81,7 +91,10 @@ class IntegratedAuthenticator extends AbstractAuthenticator {
     public function getGroup($username)
     {
         // Retrieve the User from the database by name
-        $user = UserQuery::create()->findByName($username);
+        $user = UserQuery::create()->findOneByName($username);
+        if (null === $user) {
+            return "";
+        }
 
         // Return the group
         return $user["research_group"];

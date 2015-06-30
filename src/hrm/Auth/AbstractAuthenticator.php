@@ -1,6 +1,6 @@
 <?php
 
-namespace hrm\auth;
+namespace hrm\Auth;
 
 // Bootstrap
 require_once dirname(__FILE__) . '/../../bootstrap.php';

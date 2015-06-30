@@ -38,27 +38,40 @@ class User extends BaseUser
 
     /**
      * Attempts to login the User.
+     * @param $password String Password to be checked for current User.
      * @return bool True if the login succeeded, false otherwise.
-     * @throws \Exception if the User name and password are not set when the
+     * @throws \Exception if the User name is not set when the
      *                    logIn() method is called.
+     * @throws \Propel\Runtime\Exception\PropelException
      */
-    public function logIn()
+    public function logIn($password)
     {
         // If user name and password have not been set yet, throw an \Exception
-        if ($this->getName() == "" || $this->getPasswordHash() == "") {
-            throw new \Exception("User name and hashed password must be set " .
+        if ($this->getName() === "") {
+            throw new \Exception("User name must be set " .
             "before the User::logIn() method can be called.");
         }
 
         // Get the authenticator
+        $auth = $this->getAuthentication();
         // TODO: Get the authenticator that matches the authentication mechanism
         // TODO: specified in the database for the specific User. Currently, the
         // TODO: Authenticator is IntegratedAuthenticator for everyone.
-        $this->authenticator = AuthenticatorFactory::getAuthenticator("integrated");
+        // TEMP!
+        $auth = "integrated";
+        $this->authenticator = AuthenticatorFactory::getAuthenticator($auth);
 
         // Authenticate the User against the selected mechanism
         $this->isLoggedIn = $this->authenticator->authenticate(
-                $this->getName(), $this->getPasswordHash());
+                $this->getName(), $password);
+
+        // Update the last access date for a successful login
+        if ($this->isLoggedIn == true) {
+            $this->setLastAccessDate(new \DateTime());
+
+            // Store the change in the database
+            $this->save();
+        }
 
         // Return current login status
         return $this->isLoggedIn;
