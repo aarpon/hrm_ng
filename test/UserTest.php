@@ -138,4 +138,17 @@ class UserTest extends PHPUnit_Framework_TestCase
         # Check the name
         $this->assertTrue($user->getName() == "TestUser");
     }
+
+    /**
+     * Test logging in a given User.
+     */
+    public function testLoginUser()
+    {
+        # Get the User
+        $user = \hrm\UserQuery::create()->findOneByName("TestUser");
+        $this->assertTrue(null !== $user);
+
+        # Now try logging the User in
+        $this->assertTrue($user->logIn("TestPassword") === true);
+    }
 }
