@@ -1,9 +1,9 @@
 <?php
 
-namespace hrm\Auth;
+namespace hrm\UserAuth;
 
 // Bootstrap
-require_once dirname(__FILE__) . '/../../bootstrap.php';
+require_once dirname(__FILE__) . '/../../../bootstrap.php';
 
 /**
  * Class LDAPAuthenticator
@@ -16,7 +16,7 @@ require_once dirname(__FILE__) . '/../../bootstrap.php';
  * A user with read-access to the LDAP server must be set up in the
  * configuration file for queries to be possible.
  *
- * @package hrm\Auth
+ * @package hrm\User\Auth
  */
 class LDAPAuthenticator extends AbstractAuthenticator {
 
@@ -96,7 +96,7 @@ class LDAPAuthenticator extends AbstractAuthenticator {
         global $HRM_LOGGER;
 
         // Include the configuration file
-        include(dirname(__FILE__) . "/../../../config/auth//ldap_config.inc");
+        include(dirname(__FILE__) . "/../../../../config/auth//ldap_config.inc");
 
         // Assign the variables
         $this->m_LDAP_Host = $LDAP_CONFIG['ldap_host'];

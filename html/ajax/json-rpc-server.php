@@ -55,7 +55,7 @@ PHP:          $params[0] := "ExcitationWavelength"
 namespace hrm;
 
 // Bootstrap
-use hrm\Base\UserQuery;
+use hrm\User\Base\UserQuery;
 
 require_once dirname(__FILE__) . '/../../src/bootstrap.php';
 

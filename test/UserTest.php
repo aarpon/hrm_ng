@@ -24,7 +24,7 @@ class UserTest extends PHPUnit_Framework_TestCase
      */
     public function testInstantiation()
     {
-        $user = new \hrm\User();
+        $user = new \hrm\User\User();
         $this->assertTrue($user !== null);
     }
 
@@ -40,7 +40,7 @@ class UserTest extends PHPUnit_Framework_TestCase
     {
         # Create a UserQuery to retrieve a collection
         # of all User objects
-        $users = \hrm\UserQuery::create()->find();
+        $users = \hrm\User\UserQuery::create()->find();
 
         # Look for the user we just added.
         foreach ($users as $user) {
@@ -54,7 +54,7 @@ class UserTest extends PHPUnit_Framework_TestCase
     public function testAddUser()
     {
         # Create user
-        $user = new \hrm\User();
+        $user = new \hrm\User\User();
 
         # Set all properties
         $user->setName("TestUser");
@@ -90,7 +90,7 @@ class UserTest extends PHPUnit_Framework_TestCase
         $this->setExpectedException("\\Propel\\Runtime\\Exception\\PropelException");
 
         # Create user
-        $user = new \hrm\User();
+        $user = new \hrm\User\User();
 
         # Set all properties (the name is the same)
         $user->setName("TestUser");
@@ -114,7 +114,7 @@ class UserTest extends PHPUnit_Framework_TestCase
     public function testRetrieveUserByName()
     {
         # Create a UserQuery to retrieve the User by name.
-        $user = \hrm\UserQuery::create()->findByName("TestUser");
+        $user = \hrm\User\UserQuery::create()->findByName("TestUser");
         $this->assertTrue($user->count() == 1);
     }
 
@@ -132,7 +132,7 @@ class UserTest extends PHPUnit_Framework_TestCase
         $this->userID = $userID;
 
         # Create a UserQuery
-        $q = new \hrm\UserQuery();
+        $q = new \hrm\User\UserQuery();
         $user = $q->findPK($this->userID);
         $this->assertTrue($user !== null);
 
@@ -146,7 +146,7 @@ class UserTest extends PHPUnit_Framework_TestCase
     public function testLoginUser()
     {
         # Get the User
-        $user = \hrm\UserQuery::create()->findOneByName("TestUser");
+        $user = \hrm\User\UserQuery::create()->findOneByName("TestUser");
         $this->assertTrue(null !== $user);
 
         # Now try logging the User in

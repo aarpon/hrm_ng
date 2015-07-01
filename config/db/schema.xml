@@ -2,10 +2,14 @@
 <database name="hrm_ng" defaultIdMethod="native">
 
 
-    <!-- Table: user -->
+    <!--
+
+        Table: userdata
+
+    -->
     <table name="userdata"
            phpName="User"
-           namespace="hrm">
+           namespace="hrm\User">
 
         <!-- Id : primary key -->
         <column name="id"
@@ -89,15 +93,87 @@
                 valueSet="active,disabled,requested"
                 required="true"/>
 
-        <!-- Make the 'name' column unique
-
-        TODO: Check that the size argument is compatible with PostgreSQL.
-        -->
+        <!-- Make the 'name' column unique -->
         <unique name="UserName">
             <unique-column name="name" size="255" />
         </unique>
 
     </table>
+
+    <!--
+
+        Table: parameter_type
+
+    -->
+    <table name="parameter_type"
+           namespace="hrm\Param"
+           phpName="ParameterType">
+
+        <!-- Id : primary key -->
+        <column name="id"
+                type="integer"
+                required="true"
+                primaryKey="true"
+                autoIncrement="true"/>
+
+        <!-- Name -->
+        <column name="name"
+                type="varchar"
+                size="255"
+                required="true"/>
+
+        <!-- Name -->
+        <column name="description"
+                type="varchar"
+                size="255"
+                required="true"/>
+
+        <!-- Make the 'name' column unique -->
+        <unique name="ParameterTypeName">
+            <unique-column name="name" size="255" />
+        </unique>
+
+    </table>
+
+    <!--
+
+        Table: numerical_parameter_definition
+
+    -->
+    <table name="numerical_parameter_type"
+           namespace="hrm\Param"
+           phpName="NumericalParameterType">
+
+        <!-- Id : primary key -->
+        <column name="id"
+                type="integer"
+                required="true"
+                primaryKey="true"
+                autoIncrement="true"/>
+
+        <!-- parameter_id : foreign key -->
+        <column name="parameter_id"
+                type="integer" />
+
+        <!-- Min value -->
+        <column name="min_value"
+                type="float"
+                required="false"/>
+
+        <!-- Max value -->
+        <column name="max_value"
+                type="float"
+                required="false"/>
+
+        <foreign-key foreignTable="parameter_type">
+            <reference local="parameter_id" foreign="id" />
+        </foreign-key>
+        <behavior name="delegate">
+            <parameter name="to" value="parameter_type" />
+        </behavior>
+
+    </table>
+
 
     <!-- Table: template
 
@@ -111,7 +187,8 @@
     -->
     <table name="template"
            phpName="Template"
-           namespace="hrm">
+           namespace="hrm\Param"
+           abstract="true">
 
         <!-- Id : primary key -->
         <column name="id"

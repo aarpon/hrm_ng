@@ -1,12 +1,12 @@
 <?php
 
-namespace hrm\Auth;
+namespace hrm\User\Auth;
 
 // Bootstrap
 use adLDAP\adLDAP;
 use adLDAP\adLDAPException;
 
-require_once dirname(__FILE__) . '/../../bootstrap.php';
+require_once dirname(__FILE__) . '/../../../../bootstrap.php';
 
 /**
  * Class ActiveDirectoryAuthenticator
@@ -19,7 +19,7 @@ require_once dirname(__FILE__) . '/../../bootstrap.php';
  * A user with read-access to Active Directory must be set up in the
  * configuration file for queries to be possible.
 
- * @package hrm\Auth
+ * @package hrm\User\Auth
  */
 class ActiveDirectoryAuthenticator extends AbstractAuthenticator {
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace hrm\Auth;
+namespace hrm\User\Auth;
 
 // Bootstrap
-require_once dirname(__FILE__) . '/../../bootstrap.php';
+require_once dirname(__FILE__) . '/../../../bootstrap.php';
 
-use hrm\UserQuery;
+use hrm\User\UserQuery;
 
 /**
  * Class AbstractAuthenticator Base Authenticator class that provides an interface
@@ -14,7 +14,7 @@ use hrm\UserQuery;
  * The User class expects concrete Authenticator classes to extend this class and
  * implement all of its abstract methods.
  *
- * @package hrm\Auth
+ * @package hrm\User\Auth
  */
 abstract class AbstractAuthenticator
 {

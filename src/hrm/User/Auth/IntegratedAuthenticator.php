@@ -1,9 +1,9 @@
 <?php
 
-namespace hrm\Auth;
+namespace hrm\User\Auth;
 
 // Bootstrap
-require_once dirname(__FILE__) . '/../../bootstrap.php';
+require_once dirname(__FILE__) . '/../../../bootstrap.php';
 
 use \hrm\UserQuery;
 
@@ -23,7 +23,7 @@ class IntegratedAuthenticator extends AbstractAuthenticator {
     public function authenticate($username, $password)
     {
         // Retrieve the User from the database by name
-        $user = UserQuery::create()->findOneByName($username);
+        $user = \hrm\User\UserQuery::create()->findOneByName($username);
         if (null === $user) {
             return false;
         }

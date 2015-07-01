@@ -1,19 +1,24 @@
 <?php
 
-namespace hrm;
+namespace hrm\User;
 
-use hrm\Base\User as BaseUser;
-use hrm\Auth\AuthenticatorFactory;
+use hrm\User\Base\User as BaseUser;
 
 /**
- * User class.
+ * Skeleton subclass for representing a row from the 'userdata' table.
+ *
+ *
+ *
+ * You should add additional methods to this class to meet the
+ * application requirements.  This class will only be generated as
+ * long as it does not already exist in the output directory.
  *
  */
 class User extends BaseUser
 {
 
     /**
-     * @var \hrm\Auth\AbstractAuthenticator The authenticator that will check for the User
+     * @var \hrm\User\Auth\AbstractAuthenticator The authenticator that will check for the User
      * credentials.
      *
      * Depending on the configuration in the database, the actual authenticator
@@ -34,12 +39,12 @@ class User extends BaseUser
         // If user name and password have not been set yet, throw an \Exception
         if ($this->getName() === "") {
             throw new \Exception("User name must be set " .
-            "before the User::logIn() method can be called.");
+                    "before the User::logIn() method can be called.");
         }
 
         // Get the authenticator specified for the User
         $auth = $this->getAuthentication();
-        $this->authenticator = AuthenticatorFactory::getAuthenticator($auth);
+        $this->authenticator = Auth\AuthenticatorFactory::getAuthenticator($auth);
 
         // Authenticate the User against the selected mechanism
         $result = $this->authenticator->authenticate($this->getName(), $password);

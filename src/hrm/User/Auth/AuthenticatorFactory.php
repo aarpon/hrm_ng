@@ -1,15 +1,15 @@
 <?php
 
-namespace hrm\Auth;
+namespace hrm\User\Auth;
 
 // Bootstrap
-require_once dirname(__FILE__) . '/../../bootstrap.php';
+require_once dirname(__FILE__) . '/../../../bootstrap.php';
 
 /**
  * Class AuthenticatorFactory Return the correct Authenticator class depending
  * on the passed string.
  *
- * @package hrm\Auth
+ * @package hrm\User\Auth
  */
 class AuthenticatorFactory
 {
