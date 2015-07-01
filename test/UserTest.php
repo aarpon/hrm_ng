@@ -13,9 +13,9 @@ class UserTest extends PHPUnit_Framework_TestCase
 {
 
     /**
-     * @var userID: the ID we will be using in the test,
-     *              in case the database already contains
-     *             data.
+     * @var string userID: the ID we will be using in the test,
+     *                     in case the database already contains
+     *                     data.
      */
     protected $userID;
 
@@ -124,6 +124,7 @@ class UserTest extends PHPUnit_Framework_TestCase
      * This needs to retrieve the userID we stored in testAddUser().
      *
      * @depends testAddUser
+     * @param $userID Integer User ID for query.
      */
     public function testRetrieveUserByPrimaryKey($userID)
     {

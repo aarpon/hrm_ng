@@ -13,7 +13,7 @@ class User extends BaseUser
 {
 
     /**
-     * @var AbstractAuthenticator The authenticator that will check for the User
+     * @var \hrm\Auth\AbstractAuthenticator The authenticator that will check for the User
      * credentials.
      *
      * Depending on the configuration in the database, the actual authenticator

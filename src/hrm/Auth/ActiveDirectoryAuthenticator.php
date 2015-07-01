@@ -4,6 +4,7 @@ namespace hrm\Auth;
 
 // Bootstrap
 use adLDAP\adLDAP;
+use adLDAP\adLDAPException;
 
 require_once dirname(__FILE__) . '/../../bootstrap.php';
 
@@ -23,12 +24,12 @@ require_once dirname(__FILE__) . '/../../bootstrap.php';
 class ActiveDirectoryAuthenticator extends AbstractAuthenticator {
 
     /**
-     * @var $m_AdLDAP AdLDAP The AdLDAP connection object
+     * @var AdLDAP The AdLDAP connection object
      */
     private $m_AdLDAP;
 
     /**
-     * @var $m_GroupIndex Integer Index (level) of the group to consider
+     * @var Integer Index (level) of the group to consider
      *
      * Users usually belong to several groups, m_GroupIndex defines which
      * level of the hierarchy to consider. If $m_GroupIndex is -1 and the
@@ -38,7 +39,7 @@ class ActiveDirectoryAuthenticator extends AbstractAuthenticator {
     private $m_GroupIndex;
 
     /**
-     * @var $m_ValidGroups  Array Array of valid groups
+     * @var Array Array of valid groups
      *
      * If $m_GroupIndex is set to -1 and $m_ValidGroups is not empty,
      * the groups array returned by adLDAP->user_groups will be compared
@@ -49,17 +50,23 @@ class ActiveDirectoryAuthenticator extends AbstractAuthenticator {
     private $m_ValidGroups;
 
     /**
-     * @var $m_UsernameSuffix TODO: Complete
+     * @var string FQDN of the root domain (with a leading dot)
+     *
+     * Please see the online installation documentation.
      */
     private $m_UsernameSuffix;
 
     /**
-     * @var $m_UsernameSuffixReplaceMatch TODO: Complete
+     * @var string Suffix to be replaced.
+     *
+     * Please see the online installation documentation.
      */
     private $m_UsernameSuffixReplaceMatch;
 
     /**
-     * @var $m_UsernameSuffixReplaceString TODO: Complete
+     * @var string Correct suffix.
+     *
+     * Please see the online installation documentation.*
      */
     private $m_UsernameSuffixReplaceString;
 
@@ -152,7 +159,7 @@ class ActiveDirectoryAuthenticator extends AbstractAuthenticator {
      */
     public function getEmailAddress($username) {
 
-        // Logger
+        /** @var \Monolog\Logger The global HRM logger. */
         global $HRM_LOGGER;
 
         // If needed, process the user name suffix for subdomains
@@ -186,6 +193,7 @@ class ActiveDirectoryAuthenticator extends AbstractAuthenticator {
      */
     public function getGroup($username) {
 
+        /** @var \Monolog\Logger The global HRM logger. */
         global $HRM_LOGGER;
 
         // If needed, process the user name suffix for subdomains
