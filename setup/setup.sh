@@ -5,9 +5,11 @@
 #
 PROJECT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../
 
+###############################################################################
 #
 # Composer
 #
+###############################################################################
 
 # Update composer itself
 ${PROJECT_DIR}/composer.phar self-update
@@ -21,9 +23,11 @@ else
     ${PROJECT_DIR}/composer.phar update
 fi
 
+###############################################################################
 #
 # Propel
 #
+###############################################################################
 
 # Make sure the credentials file exists
 if [ ! -f "${PROJECT_DIR}/config/db/propel.yaml" ]; then
@@ -67,3 +71,11 @@ ${PROJECT_DIR}vendor/bin/propel config:convert \
 ${PROJECT_DIR}vendor/bin/propel sql:insert \
     --config-dir "${PROJECT_DIR}/config/db" \
     --sql-dir "${PROJECT_DIR}/config/db"
+
+###############################################################################
+#
+# Populate database
+#
+###############################################################################
+
+php ${PROJECT_DIR}/setup/populate_db.php

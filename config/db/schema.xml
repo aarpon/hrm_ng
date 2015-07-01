@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <database name="hrm_ng" defaultIdMethod="native">
 
-
     <!--
 
         Table: userdata
@@ -106,7 +105,7 @@
 
     -->
     <table name="parameter_type"
-           namespace="hrm\Param"
+           namespace="hrm\Param\Core"
            phpName="ParameterType">
 
         <!-- Id : primary key -->
@@ -137,11 +136,11 @@
 
     <!--
 
-        Table: numerical_parameter_definition
+        Table: numerical_parameter_type
 
     -->
     <table name="numerical_parameter_type"
-           namespace="hrm\Param"
+           namespace="hrm\Param\Core"
            phpName="NumericalParameterType">
 
         <!-- Id : primary key -->
@@ -151,8 +150,8 @@
                 primaryKey="true"
                 autoIncrement="true"/>
 
-        <!-- parameter_id : foreign key -->
-        <column name="parameter_id"
+        <!-- parameter_type_id : foreign key -->
+        <column name="parameter_type_id"
                 type="integer" />
 
         <!-- Min value -->
@@ -166,7 +165,7 @@
                 required="false"/>
 
         <foreign-key foreignTable="parameter_type">
-            <reference local="parameter_id" foreign="id" />
+            <reference local="parameter_type_id" foreign="id" />
         </foreign-key>
         <behavior name="delegate">
             <parameter name="to" value="parameter_type" />
@@ -174,8 +173,69 @@
 
     </table>
 
+    <!--
 
-    <!-- Table: template
+    Table: parameter
+
+    The Parameter name has a foreign key that points to
+    the ParameterType id table since each Parameter must be
+    linked to the corresponding type.
+    -->
+    <table name="parameter"
+           namespace="hrm\Param\Core"
+           phpName="Parameter">
+
+        <!-- Id : primary key -->
+        <column name="id"
+                type="integer"
+                required="true"
+                primaryKey="true"
+                autoIncrement="true"/>
+
+        <column name="parameter_type_id"
+                type="integer"
+                required="true"/>
+
+        <foreign-key foreignTable="parameter_type">
+            <reference local="parameter_type_id" foreign="id" />
+        </foreign-key>
+
+    </table>
+
+    <!--
+
+        Table: numerical_parameter
+
+    -->
+    <table name="numerical_parameter"
+           namespace="hrm\Param\Core"
+           phpName="NumericalParameter">
+
+        <!-- Id : primary key -->
+        <column name="id"
+                type="integer"
+                required="true"
+                primaryKey="true"
+                autoIncrement="true"/>
+
+        <column name="parameter_id"
+                type="integer"/>
+
+        <column name="value"
+                type="float"/>
+
+        <foreign-key foreignTable="parameter">
+            <reference local="parameter_id" foreign="id" />
+        </foreign-key>
+        <behavior name="delegate">
+            <parameter name="to" value="parameter" />
+        </behavior>
+
+    </table>
+
+    <!--
+
+        Table: template
 
         Foreign key: user
 
@@ -187,7 +247,7 @@
     -->
     <table name="template"
            phpName="Template"
-           namespace="hrm\Param"
+           namespace="hrm\Template"
            abstract="true">
 
         <!-- Id : primary key -->
