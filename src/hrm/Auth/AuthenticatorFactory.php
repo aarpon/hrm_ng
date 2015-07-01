@@ -35,13 +35,13 @@ class AuthenticatorFactory
 
                 return new IntegratedAuthenticator();
 
-            case "LDAP":
+            case "ldap":
 
                 throw new \Exception("Not implemented yet!");
 
-            case "ACTIVE_DIR":
+            case "active_dir":
 
-                throw new \Exception("Not implemented yet!");
+                return new ActiveDirectoryAuthenticator();
 
             default:
 

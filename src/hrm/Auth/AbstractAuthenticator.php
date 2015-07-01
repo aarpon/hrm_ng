@@ -54,13 +54,13 @@ abstract class AbstractAuthenticator
     public function isActive($username)
     {
         // Get the User by name
-        $user = UserQuery::create()->findByName($username);
-        if ($user->count() == 0) {
+        $user = UserQuery::create()->findOneByName($username);
+        if (null === $user) {
             throw new \Exception("The requested user does not exist.");
         }
 
         // Test whether the status is 'active'
-        return $user[0]["status"] === "active";
+        return $user->getStatus() === "active";
     }
 
     /**
@@ -74,13 +74,13 @@ abstract class AbstractAuthenticator
     public function isSuspended($username)
     {
         // Get the User by name
-        $user = UserQuery::create()->findByName($username);
-        if ($user->count() == 0) {
+        $user = UserQuery::create()->findOneByName($username);
+        if (null === $user) {
             throw new \Exception("The requested user does not exist.");
         }
 
         // Test whether the status is 'disabled'
-        return $user[0]["status"] === "disabled";
+        return $user->getStatus() === "disabled";
     }
 
     /**
@@ -92,14 +92,14 @@ abstract class AbstractAuthenticator
     public function isRequested($username)
     {
         // Get the User by name
-        $user = UserQuery::create()->findByName($username);
-        if ($user->count() == 0) {
+        $user = UserQuery::create()->findOneByName($username);
+        if (null === $user) {
             // There is no request for current User.
             return false;
         }
 
         // Test whether the status is 'requested'
-        return $user[0]["status"] === "requested";
+        return $user->getStatus() === "requested";
     }
 
 }

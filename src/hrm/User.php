@@ -13,7 +13,8 @@ class User extends BaseUser
 {
 
     /**
-     * @var AbstractAuthenticator The authenticator that will check for the User credentials.
+     * @var AbstractAuthenticator The authenticator that will check for the User
+     * credentials.
      *
      * Depending on the configuration in the database, the actual authenticator
      * will be one of the classes extending AbstractAuthenticator.
@@ -36,13 +37,8 @@ class User extends BaseUser
             "before the User::logIn() method can be called.");
         }
 
-        // Get the authenticator
+        // Get the authenticator specified for the User
         $auth = $this->getAuthentication();
-        // TODO: Get the authenticator that matches the authentication mechanism
-        // TODO: specified in the database for the specific User. Currently, the
-        // TODO: Authenticator is IntegratedAuthenticator for everyone.
-        // TEMP!
-        $auth = "integrated";
         $this->authenticator = AuthenticatorFactory::getAuthenticator($auth);
 
         // Authenticate the User against the selected mechanism

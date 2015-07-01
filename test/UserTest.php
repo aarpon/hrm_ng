@@ -61,7 +61,7 @@ class UserTest extends PHPUnit_Framework_TestCase
         $user->setPasswordHash("TestPassword");
         $user->setEmail("test@email.com");
         $user->setResearchGroup("TestGroup");
-        $user->setAuthentication("active_dir");
+        $user->setAuthentication("integrated");
         $user->setRole("user");
         $user->setCreationDate(new DateTime());
         $user->setLastAccessDate(new DateTime());
