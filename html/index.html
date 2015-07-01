@@ -48,7 +48,7 @@
                         url     : 'ajax/json-rpc-server.php',
                         data    : {id : $scope.userid,
                                    jsonrpc: "2.0",
-                                   method : "login",
+                                   method : "logIn",
                                    params : $scope.user },  // pass in data as strings
                         headers : {'Content-Type': 'application/json'}  // set the headers so angular passing info as form data (not request payload)
                     })

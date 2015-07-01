@@ -68,9 +68,6 @@ if (null === $ajaxRequest) {
     die("Nothing POSTed!");
 }
 
-// TODO: Actions will need to be filtered (i.e. allowed) depending on the
-// TODO: login status and role of the User.
-
 // ============================================================================
 //
 // PROCESS THE POSTED ARGUMENTS
@@ -114,7 +111,7 @@ if (array_key_exists('params', $ajaxRequest)) {
 
 switch ($method) {
 
-    case "login":
+    case "logIn":
 
         // Make sure the expected parameters exist
         if (!(array_key_exists('username', $params) &&
@@ -123,6 +120,11 @@ switch ($method) {
         }
 
         $json = logIn($params["username"], $params["password"]);
+        break;
+
+    case "logOut":
+
+        $json = logOut($clientID);
         break;
 
     case "isLoggedIn":
@@ -154,7 +156,7 @@ return true;
  * returns that the session is not active (and the User is therefore not logged
  * in), no method should be executed.
  *
- * @param $client_session_id Session ID obtained from the client.
+ * @param $client_session_id string|integer Session ID obtained from the client.
  * @return array Result array with keys "can_run" (true|false) and "message".
  *               The message contains a human-friendly explanation of what
  *               went wrong.
@@ -197,7 +199,7 @@ function __isSessionActive($client_session_id) {
  * Before the method is called, the __sessionIsActive() method should
  * be called to make sure that a session is active at all!
  *
- * @param $methodName One of the methods run in this script.
+ * @param $methodName string One of the methods run in this script.
  * @return bool True if the method can be run, false otherwise.
  * @throws \Exception It the role returned for the User is not recognized.
  * @throws \Propel\Runtime\Exception\PropelException
@@ -328,10 +330,41 @@ function logIn($username, $password) {
     } else {
 
         // Fill the json array
-        $
         $json["result"] = false;
         $json["success"] = true;
         $json["message"] = "The user could not be logged in.";
+
+    }
+
+    // Return as a JSON string
+    return (json_encode($json));
+}
+
+function logOut($client_session_id) {
+
+    // Initialize output JSON array
+    $json = initJSONArray();
+
+    // Check the session and the User login state
+    $result = __isSessionActive($client_session_id);
+    if (! $result['can_run']) {
+
+        $json['result'] = false;
+        $json['success'] = false;
+        $json['message'] = $result['message'];
+
+    } else {
+
+        // Destroy curent session
+        session_unset();
+        session_destroy();
+
+        // Report success
+        $json['result'] = true;
+        $json['success'] = true;
+        $json['id'] = -1;
+        $json['message'] = "";
+
     }
 
     // Return as a JSON string
@@ -350,9 +383,10 @@ function logIn($username, $password) {
  *    - the PHP session id must contain the User ID
  *    - $username must match the name of the User stored in the PHP session
  *
- * @param $client_id: session id obtained from the client.
- * @param $username: name of the User to test for log in status.
+ * @param $client_session_id string|integer session id obtained from the client.
  * @return array JSON array.
+ * @internal param $client_id : session id obtained from the client.
+ * @internal param $username : name of the User to test for log in status.
  */
 function isLoggedIn($client_session_id) {
 
@@ -362,20 +396,26 @@ function isLoggedIn($client_session_id) {
     // Check the session and the User login state
     $result = __isSessionActive($client_session_id);
     if (! $result['can_run']) {
+
         $json['result'] = false;
         $json['success'] = false;
         $json['message'] = $result['message'];
+
     } else {
 
-        if (! isMethodAllowed("isLoggedIn")) {
+        if (! __isMethodAllowed("isLoggedIn")) {
+
             $json['result'] = false;
             $json['success'] = false;
             $json['message'] = "The user is not allowed to perform this operation.";
+
         } else {
+
             $json['result'] = true;
             $json['success'] = true;
             $json['id'] = $client_session_id;
             $json['message'] = "";
+
         }
     }
 
