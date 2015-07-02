@@ -7,14 +7,14 @@ namespace hrm\Param;
  */
 class NumericalAperture extends Core\NumericalParameter
 {
+    use ParameterTrait;
+
     /**
-     * Constructor: must call the base constructor.
-     *
-     * @throws \Exception if the base constructor failed.
+     * Constructor: must call the ParameterTrait::init() method.
      */
     public function __construct()
     {
-        parent::__construct("NumericalAperture");
-
+        // Map to its type
+        ParameterTrait::init($this);
     }
 }

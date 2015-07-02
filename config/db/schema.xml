@@ -200,6 +200,12 @@
             <reference local="parameter_type_id" foreign="id" />
         </foreign-key>
 
+        <!-- Name -->
+        <column name="name"
+                type="varchar"
+                size="255"
+                required="true"/>
+
     </table>
 
     <!--

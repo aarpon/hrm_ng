@@ -17,6 +17,14 @@ class ParameterTest extends PHPUnit_Framework_TestCase
         $NA = new \hrm\Param\NumericalAperture();
         $this->assertTrue($NA != null);
 
+        // Get the name
+        $name = $NA->getName();
+        $this->assertTrue($name == "NumericalAperture");
+
+        // Get the description
+        $description = $NA->getDescription();
+        $this->assertTrue($description == "Numerical aperture");
+
     }
 
 }
