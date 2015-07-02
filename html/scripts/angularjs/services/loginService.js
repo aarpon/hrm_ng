@@ -10,7 +10,7 @@ hrmapp.service('loginService', function( $http, $q, $rootScope ) {
     //return available functions
     return({
         loginUser: loginUser,
-        checkLoginStatus: isLoggedIn,
+        isLoggedIn: isLoggedIn,
         getUserId: getUserID,
         logoutUser: logoutUser
     });
@@ -98,7 +98,7 @@ hrmapp.service('loginService', function( $http, $q, $rootScope ) {
     function handleSuccess( response ) {
         if(response.data.success && response.data.result) {
             userid = response.data.id;
-            isUserLoggedIn = (userid =! -1);
+            isUserLoggedIn = (userid != -1);
             $rootScope.$broadcast('event:user-change');
 
         }

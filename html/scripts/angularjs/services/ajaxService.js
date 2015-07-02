@@ -9,7 +9,7 @@ hrmapp.service('ajaxService', function( $http, $q, loginService ) {
     });
 
     function sendRequest(method, parameters) {
-        var userId = loginService.getUserID();
+        var userId = loginService.getUserId;
 
         var request = $http({
             method: 'POST',
@@ -48,6 +48,9 @@ hrmapp.service('ajaxService', function( $http, $q, loginService ) {
         if(response.data.success) {
             return {result: response.data.result, message: response.data.message}
         }
+        return( $q.reject( response.data.message ) );
+
+
 
 
     }

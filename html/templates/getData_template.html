@@ -1,6 +1,6 @@
 <div ng-controller="dataController">
     <div ng-show="isLoggedIn">
-        <input type="text" class="input-sm" ng-model="request.method">
+        parameter: <input type="text" class="input-sm" ng-model="request.method">
     <button class='btn btn-danger' ng-click="getSensitiveData()" >Get Data From Database</button>
         <pre >Sensitive Data: {{theData | json}}</pre>
     </div>

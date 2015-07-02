@@ -7,14 +7,12 @@ hrmapp.controller('dataController', function( $scope, logService, ajaxService, l
     This wants to grab data for the user, let's make a simple function
      */
 
-    $scope.isLoggedIn = false;
+    $scope.isLoggedIn = true;
     $scope.theData = [];
     $scope.request = [];
     $scope.request.method = 'isLoggedIn';
 
-    $rootScope.$on('event:user-change', function() {
-        $scope.isLoggedIn = loginService.isLoggedIn();
-    });
+
 
     $scope.getSensitiveData = function() {
         ajaxService.sendRequest($scope.request.method)
@@ -26,8 +24,9 @@ hrmapp.controller('dataController', function( $scope, logService, ajaxService, l
     };
 
     function manageSuccessfulRequest(data) {
-        $scope.theData = data.result;
-
+        if (data.success) {
+            $scope.theData = data.result;
+        }
         logService.addLog({type: 'success', message: 'Result was: '+ data.result + ' Message: '+data.message});
     }
 
