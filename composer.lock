@@ -176,12 +176,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/propelorm/Propel2.git",
-                "reference": "455c8fe21fc32142e30e4dba44a1d5e3123da163"
+                "reference": "edeb1d5b67545fe2ce7f6670362a33f7cfd36247"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/455c8fe21fc32142e30e4dba44a1d5e3123da163",
-                "reference": "455c8fe21fc32142e30e4dba44a1d5e3123da163",
+                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/edeb1d5b67545fe2ce7f6670362a33f7cfd36247",
+                "reference": "edeb1d5b67545fe2ce7f6670362a33f7cfd36247",
                 "shasum": ""
             },
             "require": {
@@ -233,7 +233,7 @@
                 "orm",
                 "persistence"
             ],
-            "time": "2015-06-27 18:56:28"
+            "time": "2015-07-02 14:29:28"
         },
         {
             "name": "psr/log",
@@ -825,16 +825,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "2.1.6",
+            "version": "2.1.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "631e365cf26bb2c078683e8d9bcf8bc631ac4d44"
+                "reference": "07e27765596d72c378a6103e80da5d84e802f1e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/631e365cf26bb2c078683e8d9bcf8bc631ac4d44",
-                "reference": "631e365cf26bb2c078683e8d9bcf8bc631ac4d44",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/07e27765596d72c378a6103e80da5d84e802f1e4",
+                "reference": "07e27765596d72c378a6103e80da5d84e802f1e4",
                 "shasum": ""
             },
             "require": {
@@ -883,7 +883,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-06-19 07:11:55"
+            "time": "2015-06-30 06:52:35"
         },
         {
             "name": "phpunit/php-file-iterator",
