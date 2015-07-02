@@ -23,7 +23,7 @@ hrmapp.service('loginService', function( $http, $q ) {
             data: {
                 id: userid,
                 jsonrpc: "2.0",
-                method: "login",
+                method: "logIn",
                 params: userObj
             },
             headers: {'Content-Type': 'application/json'}  // set the headers so angular passing info as form data (not request payload)
