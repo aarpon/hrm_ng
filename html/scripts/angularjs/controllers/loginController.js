@@ -25,7 +25,6 @@ hrmapp.controller('loginController', function($scope, logService, loginService) 
         )
     };
 
-
     function manageSuccessfulLogout(data) {
 
         $scope.isLoggedIn = !data.result;

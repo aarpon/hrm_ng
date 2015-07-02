@@ -3,7 +3,7 @@
  * This service handles logging the user in and also serves to check the status on the server
  */
 
-hrmapp.service('loginService', function( $http, $q ) {
+hrmapp.service('loginService', function( $http, $q, $rootScope ) {
     var userid = -1;
 
     //return available functions
@@ -93,6 +93,8 @@ hrmapp.service('loginService', function( $http, $q ) {
     function handleSuccess( response ) {
         if(response.data.success && response.data.result) {
             userid = response.data.id;
+            $rootScope.$broadcast('event:user-change');
+
         }
 
         return {result: response.data.result, message: response.data.message}
