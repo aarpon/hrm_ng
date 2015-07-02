@@ -1,0 +1,4 @@
+Templates contain ONLY html code and ng- elements. There should be no logic in these.
+There should also be no style, asides from attributes for CSS
+
+Think of them as chunks of html code that we ca use on our pages

@@ -321,6 +321,7 @@ function logIn($username, $password) {
         $json["id"] = session_id();
         $json["result"] = true;
         $json["success"] = true;
+        $json["message"] = "The user was logged in.";
 
         // Store the User ID in the PHP session
         $_SESSION['UserID'] = $user->getId();
@@ -328,7 +329,6 @@ function logIn($username, $password) {
     } else {
 
         // Fill the json array
-        $
         $json["result"] = false;
         $json["success"] = true;
         $json["message"] = "The user could not be logged in.";
