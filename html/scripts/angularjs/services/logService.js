@@ -12,7 +12,7 @@ hrmapp.service('logService', function($rootScope) {
     };
 
     var delLog = function(index) {
-        if (isEmptyObject(index)) {
+        if (index != undefined) {
             logData.pop();
         } else {
             logData.splice(index,1);

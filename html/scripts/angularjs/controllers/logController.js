@@ -3,12 +3,12 @@
  * it listens to the log service and on change, displays the log
  */
 hrmapp.controller('logController', function($scope, $rootScope, logService) {
-    $scope.log =[];
+    $scope.logs =[];
 
-    $scope.log = logService.getLogs();
+    $scope.logs = logService.getLogs();
 
     $rootScope.$on('event:log-change', function() {
-        $scope.log = logService.getLogs();
+        $scope.logs = logService.getLogs();
 
     });
     $scope.closeLog = function (index) {

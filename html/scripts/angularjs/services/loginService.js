@@ -10,7 +10,8 @@ hrmapp.service('loginService', function( $http, $q ) {
     return({
         loginUser: loginUser,
         checkLoginStatus: isLoggedIn,
-        getUserId: getUserID()
+        getUserId: getUserID,
+        logoutUser: logoutUser
     });
 
 
@@ -51,6 +52,27 @@ hrmapp.service('loginService', function( $http, $q ) {
         return userid;
     }
 
+
+    function logoutUser( ) {
+        if (userid != -1) {
+            var request = $http({
+                method: 'POST',
+                url: 'ajax/json-rpc-server.php',
+                data: {
+                    id: userid,
+                    jsonrpc: "2.0",
+                    method: "logOut",
+                    params: {}
+                },
+                headers: {'Content-Type': 'application/json'}  // set the headers so angular passing info as form data (not request payload)
+            });
+
+            return ( request.then( handleSuccess, handleError ) );
+        } else {
+            return($q.reject( "You are not logged in"))
+        }
+    }
+
     /*
     PRIVATE METHODS TO CONVERT THE RESPONSES
      */
@@ -69,7 +91,7 @@ hrmapp.service('loginService', function( $http, $q ) {
     }
 
     function handleSuccess( response ) {
-        if(response.data.success) {
+        if(response.data.success && response.data.result) {
             userid = response.data.id;
         }
 

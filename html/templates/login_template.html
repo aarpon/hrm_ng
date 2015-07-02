@@ -4,4 +4,6 @@
         Password: <input type="password" ng-model="user.password" /><br />
         <input type="submit" value="Submit" />
     </form>
+
+    <button class='btn btn-default' ng-click="logoutUser()" ng-show="isLoggedIn">Logout</button>
 </div>

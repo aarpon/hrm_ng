@@ -7,24 +7,26 @@
 <head>
     <meta charset="UTF-8">
     <title></title>
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" >
 
     <script src="scripts/angularjs/angular.min.js"></script>
-    <script src="scripts/extras/ui-bootstrap-tpls-0.13.0.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="css/ui-bootstrap-tpls-0.13.0.min.js">
+    <script src="scripts/bootstrap/ui-bootstrap-tpls-0.13.0.min.js"></script>
 
+
+    <script src="scripts/angularjs/hrmApp.js"></script>
+    <script src="scripts/angularjs/controllers/logController.js"></script>
+    <script src="scripts/angularjs/controllers/loginController.js"></script>
+
+    <script src="scripts/angularjs/services/logService.js"></script>
+    <script src="scripts/angularjs/services/loginService.js"></script>
 </head>
 <body>
+
+<div ng-include="'templates/log_template.html'"></div>
+
 <div ng-include="'templates/login_template.html'"></div>
+
+<div ng-include="'templates/getData_template.html'"></div>
+
 </body>
-
-<script src="scripts/angularjs/hrmApp.js"></script>
-<script src="scripts/angularjs/controllers/logController.js"></script>
-<script src="scripts/angularjs/controllers/loginController.js"></script>
-
-<script src="scripts/angularjs/services/logService.js"></script>
-<script src="scripts/angularjs/services/loginService.js"></script>
-
-<script src="scripts/angularjs/hrmApp.js"></script>
-<script src="scripts/angularjs/hrmApp.js"></script>
-
 </html>
