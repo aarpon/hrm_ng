@@ -109,6 +109,7 @@ if (array_key_exists('params', $ajaxRequest)) {
     $params = $ajaxRequest['params'];
 }
 
+// Call the method
 switch ($method) {
 
     case "logIn":
@@ -149,6 +150,41 @@ return true;
 // INTERNAL METHODS
 //
 // ============================================================================
+
+/**
+ * Create default (PHP) array with "id", "success", "results" and "message" properties.
+ * Methods should initialize their JSON output array with this function, to make
+ * sure that there are the expected properties in the returned object (with
+ * their default values) and then fill it as needed.
+ *
+ * The default properties and corresponding values are:
+ *
+ * "id"     : session id. For most operations, this is received from the client. The
+ *            'login' operation (or method) will initialize the (PHP) session and return
+ *            the session id to the client. The client will then use this id for all
+ *            subsequent operations. Following the JSON RPC 2.0 specifications, the id
+ *            received from the client MUST be returned to the client.
+ *            The function initializes it to -1 (invalid session id).
+ * "success": whether the call was successful (boolean true) or not (false).
+ *            Defaults to false.
+ * "message": typically an error message to be displayed or parsed by the client
+ *            in case "success" is false.
+ * "result" : encapsulates the actual result from the call.
+ *
+ * Before the method functions return, they must call json_encode() on it!
+ *
+ * @return Array (PHP) with "id" => -1, "result" => "",
+ *         "success" => false and "message" => "" properties.
+ */
+function __initJSONArray()
+{
+    // Initialize the JSON array with failure
+    return (array(
+            "id" => -1,
+            "result" => "",
+            "success" => false,
+            "message" => ""));
+}
 
 /**
  * This method is used internally to make sure that the session is active
@@ -243,46 +279,57 @@ function __isMethodAllowed($methodName) {
     return true;
 }
 
+/**
+ * Fills the JSON array in case of success.
+ *
+ * @param $id string|integer Session ID
+ * @param $result Object Result from the method call.
+ * @param $message string Message returned by the method call.
+ * @return Array JSON object.
+ */
+function __setSuccess($id, $result = "", $message = "")
+{
+    // Initialize the JSON array
+    $json = __initJSONArray();
+
+    // Fill
+    $json['id'] = $id;
+    $json['success'] = true;
+    $json['result'] = $result;
+    $json['message'] = $message;
+
+    // Return it
+    return $json;
+}
+
+/**
+ * Fills the JSON array in case of failure.
+ *
+ * @param $id string|integer Session ID
+ * @param $result Object Result from the method call.
+ * @param $message string Message returned by the method call.
+ * @return Array JSON object.
+ */
+function __setFailure($id, $result = "", $message = "")
+{
+    // Initialize the JSON array
+    $json = __initJSONArray();
+
+    // Fill
+    $json['id'] = $id;
+    $json['success'] = false;
+    $json['result'] = $result;
+    $json['message'] = $message;
+
+    // Return it
+    return $json;
+}
+
 // ============================================================================
 //
 // METHOD IMPLEMENTATIONS
 //
 // ============================================================================
-
-/**
- * Create default (PHP) array with "id", "success", "results" and "message" properties.
- * Methods should initialize their JSON output array with this function, to make
- * sure that there are the expected properties in the returned object (with
- * their default values) and then fill it as needed.
- *
- * The default properties and corresponding values are:
- *
- * "id"     : session id. For most operations, this is received from the client. The
- *            'login' operation (or method) will initialize the (PHP) session and return
- *            the session id to the client. The client will then use this id for all
- *            subsequent operations. Following the JSON RPC 2.0 specifications, the id
- *            received from the client MUST be returned to the client.
- *            The function initializes it to -1 (invalid session id).
- * "success": whether the call was successful (boolean true) or not (false).
- *            Defaults to false.
- * "message": typically an error message to be displayed or parsed by the client
- *            in case "success" is false.
- * "result" : encapsulates the actual result from the call.
- *
- * Before the method functions return, they must call json_encode() on it!
- *
- * @return Array (PHP) with "id" => -1, "result" => "",
- *         "success" => false and "message" => "" properties.
- */
-function initJSONArray()
-{
-    // Initialize the JSON array with failure
-    return (array(
-            "id" => -1,
-            "result" => "",
-            "success" => false,
-            "message" => ""));
-}
 
 /**
  * Attempts to login the user with name and password received from the client and return
@@ -295,16 +342,15 @@ function initJSONArray()
 function logIn($username, $password) {
 
     // Initialize output JSON array
-    $json = initJSONArray();
+    $json = __initJSONArray();
 
     // Query the User
     $user = UserQuery::create()->findOneByName($username);
     if (null === $user) {
 
         // The User does not exist!
-        $json["success"] = false;
-        $json["message"] = "The user does not exist.";
-        return json_encode($json);
+        return json_encode(__setFailure(-1, "",
+                "The user does not exist."));
 
     }
 
@@ -319,20 +365,18 @@ function logIn($username, $password) {
         // the JSON reply
         session_start();
 
-        // Fill the json array
-        $json["id"] = session_id();
-        $json["result"] = true;
-        $json["success"] = true;
+        // Successful login
+        $json = __setSuccess(session_id(), true,
+                "The user was logged in successfully.");
 
         // Store the User ID in the PHP session
         $_SESSION['UserID'] = $user->getId();
 
     } else {
 
-        // Fill the json array
-        $json["result"] = false;
-        $json["success"] = true;
-        $json["message"] = "The user could not be logged in.";
+        // Fill the JSON array
+        $json = __setSuccess(-1, false,
+                "The user could not be logged in.");
 
     }
 
@@ -343,27 +387,24 @@ function logIn($username, $password) {
 function logOut($client_session_id) {
 
     // Initialize output JSON array
-    $json = initJSONArray();
+    $json = __initJSONArray();
 
     // Check the session and the User login state
     $result = __isSessionActive($client_session_id);
     if (! $result['can_run']) {
 
-        $json['result'] = false;
-        $json['success'] = false;
-        $json['message'] = $result['message'];
+        // Report failure
+        $json = __setFailure(-1, false, $result['message']);
 
     } else {
 
-        // Destroy curent session
+        // Destroy current session
         session_unset();
         session_destroy();
 
         // Report success
-        $json['result'] = true;
-        $json['success'] = true;
-        $json['id'] = -1;
-        $json['message'] = "";
+        $json = __setSuccess(-1, true,
+                "The user was logged out successfully.");
 
     }
 
@@ -391,30 +432,28 @@ function logOut($client_session_id) {
 function isLoggedIn($client_session_id) {
 
     // Initialize output JSON array
-    $json = initJSONArray();
+    $json = __initJSONArray();
 
     // Check the session and the User login state
     $result = __isSessionActive($client_session_id);
     if (! $result['can_run']) {
 
-        $json['result'] = false;
-        $json['success'] = false;
-        $json['message'] = $result['message'];
+        // Report failure
+        $json = __setFailure(-1, false, $result['message']);
 
     } else {
 
         if (! __isMethodAllowed("isLoggedIn")) {
 
-            $json['result'] = false;
-            $json['success'] = false;
-            $json['message'] = "The user is not allowed to perform this operation.";
+            // Report failure
+            $json = __setFailure(-1, false,
+                    "The user is not allowed to perform this operation.");
 
         } else {
 
-            $json['result'] = true;
-            $json['success'] = true;
-            $json['id'] = $client_session_id;
-            $json['message'] = "";
+            // Report success
+            $json = __setSuccess($client_session_id, true,
+                    "The user is logged in.");
 
         }
     }
