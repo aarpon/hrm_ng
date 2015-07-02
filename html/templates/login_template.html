@@ -1,0 +1,9 @@
+<div id="login-form" ng-controller="loginController">
+    <form novalidate class="simple-form" ng-submit="loginUser()" ng-hide="isLoggedIn">
+        Name: <input type="text" ng-model="user.username" /><br />
+        Password: <input type="password" ng-model="user.password" /><br />
+        <input type="submit" value="Submit" />
+    </form>
+
+    <button class='btn btn-default' ng-click="logoutUser()" ng-show="isLoggedIn">Logout</button>
+</div>

@@ -1,0 +1,5 @@
+<div id="hrm-log" ng-controller="logController">
+    <alert ng-repeat="log in logs" type="{{log.type}}" close="closeLog($index)">
+        {{log.message}}
+    </alert>
+</div>
