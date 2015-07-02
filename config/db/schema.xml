@@ -97,6 +97,11 @@
             <unique-column name="name" size="255" />
         </unique>
 
+        <!-- Validations -->
+        <behavior name="validate">
+            <parameter name="validateEmail" value="{column: email, validator: Email}" />
+        </behavior>
+
     </table>
 
     <!--
