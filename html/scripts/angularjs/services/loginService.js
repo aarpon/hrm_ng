@@ -5,6 +5,7 @@
 
 hrmapp.service('loginService', function( $http, $q, $rootScope ) {
     var userid = -1;
+    var isUserLoggedIn = false;
 
     //return available functions
     return({
@@ -33,6 +34,10 @@ hrmapp.service('loginService', function( $http, $q, $rootScope ) {
     }
 
     function isLoggedIn() {
+        return isUserLoggedIn;
+    }
+
+    function isLoggedInOnServer() {
         var request = $http({
             method: 'POST',
             url: 'ajax/json-rpc-server.php',
@@ -93,6 +98,7 @@ hrmapp.service('loginService', function( $http, $q, $rootScope ) {
     function handleSuccess( response ) {
         if(response.data.success && response.data.result) {
             userid = response.data.id;
+            isUserLoggedIn = (userid =! -1);
             $rootScope.$broadcast('event:user-change');
 
         }
