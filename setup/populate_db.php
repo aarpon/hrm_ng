@@ -8,6 +8,22 @@
 require_once dirname(__FILE__) . '/../src/bootstrap.php';
 
 /*
+ * Create a test user
+ */
+
+$user = new \hrm\User\User();
+$user->setName("TestUser");
+$user->setPasswordHash("TestPassword");
+$user->setEmail("test@email.com");
+$user->setResearchGroup("TestGroup");
+$user->setAuthentication("integrated");
+$user->setRole("user");
+$user->setCreationDate(new DateTime());
+$user->setLastAccessDate(new DateTime());
+$user->setStatus("active");
+$user->save();
+
+/*
  * Fill the NumericalParameterType table
  */
 
