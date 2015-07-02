@@ -341,9 +341,6 @@ function __setFailure($id, $result = "", $message = "")
  */
 function logIn($username, $password) {
 
-    // Initialize output JSON array
-    $json = __initJSONArray();
-
     // Query the User
     $user = UserQuery::create()->findOneByName($username);
     if (null === $user) {
@@ -386,9 +383,6 @@ function logIn($username, $password) {
 
 function logOut($client_session_id) {
 
-    // Initialize output JSON array
-    $json = __initJSONArray();
-
     // Check the session and the User login state
     $result = __isSessionActive($client_session_id);
     if (! $result['can_run']) {
@@ -430,9 +424,6 @@ function logOut($client_session_id) {
  * @internal param $username : name of the User to test for log in status.
  */
 function isLoggedIn($client_session_id) {
-
-    // Initialize output JSON array
-    $json = __initJSONArray();
 
     // Check the session and the User login state
     $result = __isSessionActive($client_session_id);
