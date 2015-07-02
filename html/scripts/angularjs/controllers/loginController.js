@@ -36,9 +36,9 @@ hrmapp.controller('loginController', function($scope, logService, loginService) 
 
     function manageSuccessfulLogin(data) {
 
-        $scope.isLoggedIn = !data.result;
+        $scope.isLoggedIn = data.result;
 
-        logService.addLog({type: 'success', message: 'Login Result was: '+ data.result.toString() + ' Message: '+data.message});
+        logService.addLog({type: 'success', message: 'Login Result was: '+ data.result + ' Message: '+data.message});
         logService.addLog({type: 'info',  message: 'userID from loginService: '+loginService.getUserId()});
     };
 });
