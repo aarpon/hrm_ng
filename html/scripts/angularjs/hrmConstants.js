@@ -1,5 +1,5 @@
 /**
- * Created by oburri on 03.07.15.
+ * Useful constants for HRM
  */
 hrmapp.constant('AUTH_EVENTS', {
     loginSuccess: 'auth-login-success',
@@ -8,12 +8,20 @@ hrmapp.constant('AUTH_EVENTS', {
     sessionTimeout: 'auth-session-timeout',
     notAuthenticated: 'auth-not-authenticated',
     notAuthorized: 'auth-not-authorized'
-})
+});
 
 hrmapp.constant('USER_ROLES', {
     all: '*',
     admin: 'admin',
-    editor: 'editor',
-    guest: 'guest'
-})
+    user: 'user',
+    manager: 'manager'
+});
+
+hrmapp.constant('LOG_EVENTS', {
+    log: 'log-log',
+    warn: 'log-warn',
+    info: 'log-info',
+    err: 'log-error',
+    debug: 'log-debug'
+});
 

@@ -14,15 +14,26 @@
 
 
     <script src="scripts/angularjs/hrmApp.js"></script>
-    <script src="scripts/angularjs/controllers/logController.js"></script>
+    <script src="scripts/angularjs/hrmConstants.js"></script>
+
+
+    <script src="scripts/angularjs/controllers/mainController.js"></script>
     <script src="scripts/angularjs/controllers/loginController.js"></script>
     <script src="scripts/angularjs/controllers/dataController.js"></script>
+    <script src="scripts/angularjs/controllers/logController.js"></script>
 
-    <script src="scripts/angularjs/providers/logService.js"></script>
-    <script src="scripts/angularjs/providers/loginService.js"></script>
+
+    <script src="scripts/angularjs/providers/hrmSession.js"></script>
+    <script src="scripts/angularjs/providers/uiLogService.js"></script>
+    <script src="scripts/angularjs/providers/authService.js"></script>
     <script src="scripts/angularjs/providers/ajaxService.js"></script>
+
+    <script src="scripts/angularjs/providers/hrmInterceptor.js"></script>
+
+
 </head>
-<body>
+
+<body ng-controller="mainController">
 
 <div ng-include="'templates/log_template.html'"></div>
 
