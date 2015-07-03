@@ -1,7 +1,7 @@
 /**
  * Created by oburri on 02.07.15.
  */
-hrmapp.service('ajaxService', function( $http, $q, loginService ) {
+hrmapp.service('ajaxService', function( $http, $q ) {
 
     //return available functions
     return({
@@ -9,18 +9,15 @@ hrmapp.service('ajaxService', function( $http, $q, loginService ) {
     });
 
     function sendRequest(method, parameters) {
-        var userId = loginService.getUserId;
 
         var request = $http({
             method: 'POST',
             url: 'ajax/json-rpc-server.php',
+            headers: {'Content-Type': 'application/json'},
             data: {
-                id: userId,
-                jsonrpc: "2.0",
                 method: method,
                 params: parameters
-            },
-            headers: {'Content-Type': 'application/json'}  // set the headers so angular passing info as form data (not request payload)
+            }
         });
 
         return ( request.then( handleSuccess, handleError ) );
@@ -40,7 +37,7 @@ hrmapp.service('ajaxService', function( $http, $q, loginService ) {
             return ( $q.reject("An unknown error occurred.") );
         }
         // Otherwise, use expected error message.
-        return( $q.reject( response.data.message ) );
+        return( $q.reject( response.data ) );
 
     }
 
@@ -48,7 +45,7 @@ hrmapp.service('ajaxService', function( $http, $q, loginService ) {
         if(response.data.success) {
             return {result: response.data.result, message: response.data.message}
         }
-        return( $q.reject( response.data.message ) );
+        return( $q.reject( response.data ) );
 
 
 

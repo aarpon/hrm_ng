@@ -1,13 +1,13 @@
 /**
  * Created by oburri on 02.07.15.
  */
-hrmapp.controller('dataController', function( $scope, logService, ajaxService, loginService, $rootScope) {
+hrmapp.controller('dataController', function( $scope, uiLogService, ajaxService) {
 
     /*
     This wants to grab data for the user, let's make a simple function
      */
 
-    $scope.isLoggedIn = true;
+    $scope.isLoggedIn = false;
     $scope.theData = [];
     $scope.request = [];
     $scope.request.method = 'isLoggedIn';
@@ -18,7 +18,7 @@ hrmapp.controller('dataController', function( $scope, logService, ajaxService, l
         ajaxService.sendRequest($scope.request.method)
             .then(
             manageSuccessfulRequest, function (errorMessage) {
-                logService.addLog(['error', errorMessage]);
+                uiLogService.addLog(['error', errorMessage]);
             }
         )
     };
@@ -27,7 +27,7 @@ hrmapp.controller('dataController', function( $scope, logService, ajaxService, l
         if (data.success) {
             $scope.theData = data.result;
         }
-        logService.addLog({type: 'success', message: 'Result was: '+ data.result + ' Message: '+data.message});
+        uiLogService.addLog({type: 'success', message: 'Result was: '+ data.result + ' Message: '+data.message});
     }
 
 });
