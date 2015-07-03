@@ -229,9 +229,11 @@
                 primaryKey="true"
                 autoIncrement="true"/>
 
+        <!-- Parameter ID -->
         <column name="parameter_id"
                 type="integer"/>
 
+        <!-- Parameter value (scalar float) -->
         <column name="value"
                 type="float"/>
 
