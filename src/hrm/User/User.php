@@ -64,14 +64,14 @@ class User extends BaseUser
      * Hashes the password before it is ready to be stored in the database.
      *
      * This function uses the Password Hashing API from PHP >= 5.5 to hash the
-     * password before it calls the parent SetPasswordHash method with the hashed
+     * password before it calls the parent setPasswordHash method with the hashed
      * password.
      *
      * @param string $password Password to be stored.
      * @return void
      * @throws \Exception If password hashing failed.
      */
-    public function SetPasswordHash($password)
+    public function setPasswordHash($password)
     {
         // Create password hash
         $passwordHash = password_hash(

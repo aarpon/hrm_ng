@@ -351,6 +351,9 @@ function logIn($username, $password) {
 
     }
 
+    // Prepare the result
+    $result = array("success" => null, "role" => null);
+
     // Try authenticating the user.
     if ($user->logIn($password)) {
 
@@ -362,8 +365,12 @@ function logIn($username, $password) {
         // the JSON reply
         session_start();
 
+        // Fill in the result array
+        $result["success"] = true;
+        $result["role"] = $user->getRole();
+
         // Successful login
-        $json = __setSuccess(session_id(), true,
+        $json = __setSuccess(session_id(), $result,
                 "The user was logged in successfully.");
 
         // Store the User ID in the PHP session
@@ -371,8 +378,12 @@ function logIn($username, $password) {
 
     } else {
 
+        // Fill in the result array
+        $result["success"] = false;
+        $result["role"] = null;
+
         // Fill the JSON array
-        $json = __setSuccess(-1, false,
+        $json = __setSuccess(-1, $result,
                 "The user could not be logged in.");
 
     }
