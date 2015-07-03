@@ -22,8 +22,6 @@ hrmapp.service('loginService', function( $http, $q, $rootScope ) {
             method: 'POST',
             url: 'ajax/json-rpc-server.php',
             data: {
-                id: userid,
-                jsonrpc: "2.0",
                 method: "logIn",
                 params: userObj
             },
