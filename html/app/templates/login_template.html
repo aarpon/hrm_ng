@@ -1,9 +1,22 @@
 <div id="login-form" ng-controller="loginController">
-    <form novalidate class="simple-form" ng-submit="loginUser(user)" ng-hide="isLoggedIn">
-        Name: <input type="text" ng-model="user.username" /><br />
-        Password: <input type="password" ng-model="user.password" /><br />
-        <input type="submit" value="Submit" />
-    </form>
-    <pre>{{user | json}}</pre>
-    <button class='btn btn-default' ng-click="logoutUser()" ng-show="isLoggedIn">Logout</button>
+    <section layout="row" layout-sm="column" layout-align="center center">
+
+        <form name="userForm">
+            <div layout style="width:300px">
+                <md-input-container>
+                    <label>Username</label>
+                    <input ng-model="credentials.username">
+                </md-input-container>
+                <md-input-container flex>
+                    <label>Password</label>
+                    <input type="password" ng-model="credentials.password">
+                </md-input-container>
+
+            </div>
+            <div layout-align="left">
+                <md-button ng-click="loginUser(credentials)">Login</md-button>
+                <md-button ng-click="showNewUserForm($event)">Create Account</md-button>
+            </div>
+        </form>
+</section>
 </div>

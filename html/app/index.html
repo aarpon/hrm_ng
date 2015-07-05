@@ -22,6 +22,12 @@
 
 
     <script type='text/javascript' src='scripts/angular/hrmApp.js'></script>
+    <script type='text/javascript' src='scripts/angular/controllers/loginController.js'></script>
+    <script type='text/javascript' src='scripts/angular/providers/authService.js'></script>
+    <script type='text/javascript' src='scripts/angular/providers/ajaxService.js'></script>
+    <script type='text/javascript' src='scripts/angular/providers/hrmSession.js'></script>
+    <script type='text/javascript' src='scripts/angular/providers/uiLogService.js'></script>
+    <script type='text/javascript' src='scripts/angular/hrmConstants.js '></script>
 
     <link type="text/css" media="all" rel="stylesheet" />
 </head>
@@ -37,6 +43,7 @@
         <md-icon md-svg-src="img/icons/ic_comment_24px.svg"></md-icon>
     </md-button>
     </section>
+    <div ng-include="'templates/login_template.html'"></div>
 </body>
 
 
