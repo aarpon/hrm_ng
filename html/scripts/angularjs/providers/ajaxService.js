@@ -43,7 +43,7 @@ hrmapp.service('ajaxService', function( $http, $q ) {
 
     function handleSuccess( response ) {
         if(response.data.success) {
-            return {result: response.data.result, message: response.data.message}
+            return {result: response.data, message: response.data.message}
         }
         return( $q.reject( response.data ) );
 

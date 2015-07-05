@@ -341,18 +341,22 @@ function __setFailure($id, $result = "", $message = "")
  */
 function logIn($username, $password) {
 
+    // Prepare the result
+    $result = array("success" => null, "role" => null);
+
     // Query the User
     $user = UserQuery::create()->findOneByName($username);
     if (null === $user) {
 
+        // Fill the result array
+        $result["success"] = false;
+        $result["role"] = null;
+
         // The User does not exist!
-        return json_encode(__setFailure(-1, "",
+        return json_encode(__setFailure(-1, $result,
                 "The user does not exist."));
 
     }
-
-    // Prepare the result
-    $result = array("success" => null, "role" => null);
 
     // Try authenticating the user.
     if ($user->logIn($password)) {
