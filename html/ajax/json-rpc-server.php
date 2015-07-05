@@ -93,11 +93,11 @@ if (!(array_key_exists('id', $ajaxRequest))) {
 // Retrieve the session ID from the client
 $clientID = $ajaxRequest['id'];
 
-// Do we have a method with params?
-if (!isset($ajaxRequest['method']) && !isset($ajaxRequest['params'])) {
+// Do we have a method? Parameters ('params') are not mandatory.
+if (!isset($ajaxRequest['method'])) {
 
-    // Expected 'method' and 'params'
-    die("Expected 'method' and 'params'.");
+    // Expected 'method'
+    die("Expected 'method'.");
 }
 
 // Get the method
@@ -125,11 +125,13 @@ switch ($method) {
 
     case "logOut":
 
+        // logOut does not take additional parameters
         $json = logOut($clientID);
         break;
 
     case "isLoggedIn":
 
+        // isLoggedIn does not take additional parameters.
         $json = isLoggedIn($clientID);
         break;
 
@@ -282,8 +284,13 @@ function __isMethodAllowed($methodName) {
 /**
  * Fills the JSON array in case of success.
  *
+ * Please mind that a success is defined as a successful execution of the
+ * requested method. For example, if the user credentials are wrong in an
+ * attempt to login the user, the method will return success, even though
+ * the result of the login attempt will be negative.
+ *
  * @param $id string|integer Session ID
- * @param $result Object Result from the method call.
+ * @param $result Array|string|null Result from the method call.
  * @param $message string Message returned by the method call.
  * @return Array JSON object.
  */
@@ -305,8 +312,10 @@ function __setSuccess($id, $result = "", $message = "")
 /**
  * Fills the JSON array in case of failure.
  *
+ * @see __setSuccess for a definition of success and failure of a method call.
+ *
  * @param $id string|integer Session ID
- * @param $result Object Result from the method call.
+ * @param $result Array|string|null Result from the method call.
  * @param $message string Message returned by the method call.
  * @return Array JSON object.
  */
