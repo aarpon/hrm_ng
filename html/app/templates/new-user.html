@@ -1,0 +1,39 @@
+<md-dialog aria-label="Mango (Fruit)">
+    <form>
+        <md-toolbar>
+            <div class="md-actions" layout="row">
+                <md-button href="http://en.wikipedia.org/wiki/Mango" target="_blank" hide show-md>
+                    More on Wikipedia
+                </md-button>
+                <span flex></span>
+                <md-button ng-click="answer('not useful')" class="md-primary">
+                    Not Useful
+                </md-button>
+                <md-button ng-click="answer('useful')" class="md-primary">
+                    Useful
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <section layout="row" layout-sm="column" layout-align="center center">
+
+                    <div layout style="width:300px">
+                        <md-input-container>
+                            <label>Username</label>
+                            <input ng-model="credentials.username">
+                        </md-input-container>
+                        <md-input-container flex>
+                            <label>Password</label>
+                            <input type="password" ng-model="credentials.password">
+                        </md-input-container>
+
+                    </div>
+                    <div layout-align="left">
+                        <md-button ng-click="loginUser(credentials)">Login</md-button>
+                        <md-button ng-click="showNewUserForm($event)">Create Account</md-button>
+                    </div>
+                </form>
+            </section>
+        </md-dialog-content>
+        </form>
+    </md-dialog>

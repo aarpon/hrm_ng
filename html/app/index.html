@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to HRM NG</title>
+    <link rel="shortcut icon" href="/favicon.ico" />
+
+    <link href="components/angular/angular-csp.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="components/angular-bootstrap/ui-bootstrap-csp.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="components/angular-material/angular-material.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="css/hrm-basic.css" rel="stylesheet">
+    <link href="components/angular-material-icons/angular-material-icons.css" media="all" rel="stylesheet" type="text/css" />
+
+    <link href="components/mdi/css/materialdesignicons.css" rel="stylesheet">
+
+    <script type='text/javascript' src='components/angular/angular.js'></script>
+    <script type='text/javascript' src='components/angular-bootstrap/ui-bootstrap.js'></script>
+    <script type='text/javascript' src='components/angular-material/angular-material.js'></script>
+    <script type='text/javascript' src='components/angular-animate/angular-animate.js'></script>
+    <script type='text/javascript' src='components/angular-aria/angular-aria.js'></script>
+    <script type='text/javascript' src='components/angular-material-icons/angular-material-icons.js'></script>
+
+
+    <script type='text/javascript' src='scripts/angular/hrmApp.js'></script>
+    <script type='text/javascript' src='scripts/angular/controllers/loginController.js'></script>
+    <script type='text/javascript' src='scripts/angular/providers/authService.js'></script>
+    <script type='text/javascript' src='scripts/angular/providers/ajaxService.js'></script>
+    <script type='text/javascript' src='scripts/angular/providers/hrmSession.js'></script>
+    <script type='text/javascript' src='scripts/angular/providers/uiLogService.js'></script>
+    <script type='text/javascript' src='scripts/angular/hrmConstants.js '></script>
+
+    <link type="text/css" media="all" rel="stylesheet" />
+</head>
+<body ng-app="hrmApp">
+<section layout="row" layout-sm="column" layout-align="center center">
+    <md-button class="md-fab md-mini" aria-label="Login" ng-href="'test.html'">
+        <md-icon class="material-icons md-24" aria-setsize="64px">android</md-icon>
+    </md-button>
+    <md-button class="md-fab md-primary" aria-label="Use Android">
+        <md-icon class="material-icons">android</md-icon>
+    </md-button>
+    <md-button class="md-fab" ng-disabled="true" aria-label="Comment">
+        <md-icon md-svg-src="img/icons/ic_comment_24px.svg"></md-icon>
+    </md-button>
+    </section>
+    <div ng-include="'templates/login_template.html'"></div>
+</body>
+
+
+
+</html>
