@@ -1,18 +1,21 @@
 /**
  * Created by oburri on 02.07.15.
  */
-hrmapp.controller('loginController', function($scope, $rootScope, $mdDialog, authService, AUTH_EVENTS, LOG_EVENTS, $mdToast) {
+hrmapp.controller('loginController', function($scope, $location, $rootScope, $mdDialog, authService, AUTH_EVENTS, LOG_EVENTS, $mdToast) {
 
     $scope.loginUser = function(credentials) {
         authService.loginUser(credentials).then(function (user) {
-            $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
             $scope.setCurrentUser(user);
+            $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
+
             $mdToast.show(
                 $mdToast.simple()
                     .content('Successful Login')
                     .position("top right")
-                    .hideDelay(2000)
+                    .hideDelay(5000)
             );
+            $location.path('main');
+
         }, function (errorMessage) {
             $rootScope.$broadcast(AUTH_EVENTS.loginFailed);
             $mdToast.show(

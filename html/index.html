@@ -20,10 +20,12 @@
     <script type='text/javascript' src='scripts/libs/angular-aria.js'></script>
     <script type='text/javascript' src='scripts/libs/angular-material-icons.js'></script>
     <script type='text/javascript' src='scripts/libs/angular-messages.js'></script>
+    <script type='text/javascript' src='scripts/libs/angular-route.js'></script>
 
 
     <script type='text/javascript' src='scripts/angular/hrmApp.js'></script>
     <script type='text/javascript' src='scripts/angular/controllers/mainController.js'></script>
+    <script type='text/javascript' src='scripts/angular/providers/routes.js'></script>
 
     <script type='text/javascript' src='scripts/angular/controllers/loginController.js'></script>
     <script type='text/javascript' src='scripts/angular/providers/authService.js'></script>
@@ -41,7 +43,8 @@
     <div flex>
         <h1 class="md-display-1" style="text-align: center">Welcome to the New and Improved Huygens Remote Manager!</h1>
     </div>
-    <div ng-include="'templates/login_template.html'"></div>
+
+    <div class="ng-view"></div>
 </div>
 </body>
 

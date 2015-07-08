@@ -3,7 +3,7 @@ module.exports = function(grunt) {
         bowercopy: {
             options: {
                 // Bower components folder will be removed afterwards
-                clean: true
+                clean: false
             },
             // Anything can be copied
             css: {
@@ -44,7 +44,8 @@ module.exports = function(grunt) {
                     'angular-animate.js': 'angular-animate/angular-animate.js',
                     'angular-aria.js': 'angular-aria/angular-aria.js',
                     'angular-material-icons.js': 'angular-material-icons/angular-material-icons.js',
-                    'angular-messages.js': 'angular-messages/angular-messages.js'
+                    'angular-messages.js': 'angular-messages/angular-messages.js',
+                    'angular-route.js': 'angular-route/angular-route.js'
                 }
             }
         }
