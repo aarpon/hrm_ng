@@ -1,0 +1,52 @@
+<md-dialog aria-label="New User Registration">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>New User Registration</h2>
+            <span flex></span>
+            <md-button class="md-fab md-mini" ng-click="cancel()">
+                <md-icon class="material-icons md-24" aria-label="Close dialog" aria-setsize="24px">close</md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+
+    <md-dialog-content>
+        <form name="newUSer">
+            <md-input-container>
+                <label>Username</label>
+                <input md-maxlength  name="username" required ng-model="user.username">
+                <div ng-messages="newUSer.username.$error">
+                    <div ng-message="required">Required field.</div>
+                    <div ng-message="md-maxlength">Your username should be less than 30 characters long.</div>
+                </div>
+            </md-input-container>
+            <md-input-container>
+                <label>Password</label>
+                <input type="password" name="password" required ng-model="user.password">
+                <div ng-messages="newUSer.password.$error">
+                    <div ng-message="required">Required field.</div>
+                </div>
+            </md-input-container>
+            <md-input-container>
+                <label>Repeat Password</label>
+                <input type="password" name="password2" required ng-model="user.password2" pw-check="user.password">
+                <div ng-messages="newUSer.password2.$error">
+                    <div ng-message="required">Required field</div>
+                    <div ng-message="pwmatch">The passwords do not match.</div>
+                </div>
+            </md-input-container>
+
+            <md-input-container>
+                <label>Request Message</label>
+                <textarea ng-model="user.requestmsg"></textarea>
+            </md-input-container>
+
+        </form>
+    </md-dialog-content>
+
+    <div class="md-actions" layout="row">
+        <md-button ng-click="submitNewUser(user)">Submit</md-button>
+        <md-button ng-click="cancel()">Cancel</md-button>
+    </div>
+
+</md-dialog>

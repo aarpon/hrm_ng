@@ -43,7 +43,8 @@ module.exports = function(grunt) {
                     'angular-material.js': 'angular-material/angular-material.js',
                     'angular-animate.js': 'angular-animate/angular-animate.js',
                     'angular-aria.js': 'angular-aria/angular-aria.js',
-                    'angular-material-icons.js': 'angular-material-icons/angular-material-icons.js'
+                    'angular-material-icons.js': 'angular-material-icons/angular-material-icons.js',
+                    'angular-messages.js': 'angular-messages/angular-messages.js'
                 }
             }
         }
