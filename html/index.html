@@ -23,17 +23,20 @@
 
 
     <script type='text/javascript' src='scripts/angular/hrmApp.js'></script>
+    <script type='text/javascript' src='scripts/angular/controllers/mainController.js'></script>
+
     <script type='text/javascript' src='scripts/angular/controllers/loginController.js'></script>
     <script type='text/javascript' src='scripts/angular/providers/authService.js'></script>
     <script type='text/javascript' src='scripts/angular/providers/ajaxService.js'></script>
     <script type='text/javascript' src='scripts/angular/providers/hrmSession.js'></script>
+    <script type='text/javascript' src='scripts/angular/providers/hrmInterceptor.js'></script>
     <script type='text/javascript' src='scripts/angular/providers/uiLogService.js'></script>
     <script type='text/javascript' src='scripts/angular/directives/pwCheckDirective.js'></script>
-    <script type='text/javascript' src='scripts/angular/hrmConstants.js '></script>
+    <script type='text/javascript' src='scripts/angular/hrmConstants.js'></script>
 
     <link type="text/css" media="all" rel="stylesheet" />
 </head>
-<body ng-app="hrmApp">
+<body ng-app="hrmApp" ng-controller="mainController">
 <div layout="column" layout-align="center center">
     <div flex>
         <h1 class="md-display-1" style="text-align: center">Welcome to the New and Improved Huygens Remote Manager!</h1>

@@ -11,10 +11,13 @@ hrmapp.factory('authService', function( ajaxService, hrmSession ) {
 
         return ajaxService.sendRequest('logIn', user)
             .then(function (res) {
-                if (res.result.result.success) {
+                if (res.result.success) {
                     hrmSession.create(user.username, res.result.id, res.result.result.role);
                     return user.username; // give the user name back.
+                } else{
+                    return ($q.reject(res.message))
                 }
+
             });
     };
 

@@ -37,7 +37,7 @@ hrmapp.service('ajaxService', function( $http, $q ) {
             return ( $q.reject("An unknown error occurred.") );
         }
         // Otherwise, use expected error message.
-        return( $q.reject( response.data ) );
+        return( $q.reject( response.data.message ) );
 
     }
 
@@ -45,7 +45,7 @@ hrmapp.service('ajaxService', function( $http, $q ) {
         if(response.data.success) {
             return {result: response.data, message: response.data.message}
         }
-        return( $q.reject( response.data ) );
+        return( $q.reject( response.data.message ) );
 
 
 
