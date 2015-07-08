@@ -1,0 +1,28 @@
+{
+  "name": "HRM-NG The New HRM",
+  "version": "0.0.0",
+  "homepage": "https://github.com/aarpon/hrm_ng",
+  "authors": [
+    "Olivier Burri <olivier.burri@gmail.com>",
+    "Aaron Ponti <aaron.ponti@bsse.ethz.ch>"
+  ],
+  "description": "The New Huygens Remote Manager",
+  "license": "GNU",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "angular": "~1.4.2",
+    "angular-aria": "~1.4.2",
+    "angular-bootstrap": "~0.13.0",
+    "angular-material": "~0.10.0",
+    "angular-material-icons": "~0.5.0",
+    "angular-animate": "~1.4.2",
+    "mdi": "~1.1.70",
+    "material-design-icons": "~2.0.0"
+  }
+}
