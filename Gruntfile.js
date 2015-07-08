@@ -8,7 +8,7 @@ module.exports = function(grunt) {
             // Anything can be copied
             css: {
                 options: {
-                    destPrefix: 'app/css'
+                    destPrefix: 'html/css'
                 },
 
                 files: {
@@ -22,7 +22,7 @@ module.exports = function(grunt) {
 
             fonts: {
                 options: {
-                    destPrefix: 'app/css'
+                    destPrefix: 'html/css'
                 },
 
                 files: {
@@ -35,7 +35,7 @@ module.exports = function(grunt) {
             // Javascript
             libs: {
                 options: {
-                    destPrefix: 'app/scripts/libs'
+                    destPrefix: 'html/scripts/libs'
                 },
                 files: {
                     'angular.js': 'angular/angular.js',
