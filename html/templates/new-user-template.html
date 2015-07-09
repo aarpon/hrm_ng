@@ -21,6 +21,14 @@
                 </div>
             </md-input-container>
             <md-input-container>
+                <label>Email</label>
+                <input type="email" name="email" required ng-model="user.email">
+                <div ng-messages="newUSer.email.$error">
+                    <div ng-message="required">Required field.</div>
+                    <div ng-message="email">Email invalid.</div>
+                </div>
+            </md-input-container>
+            <md-input-container>
                 <label>Password</label>
                 <input type="password" name="password" required ng-model="user.password">
                 <div ng-messages="newUSer.password.$error">
@@ -45,7 +53,7 @@
     </md-dialog-content>
 
     <div class="md-actions" layout="row">
-        <md-button ng-click="submitNewUser(user)">Submit</md-button>
+        <md-button ng-disabled="newUSer.$invalid" ng-click="submitNewUser(user)">Submit</md-button>
         <md-button ng-click="cancel()">Cancel</md-button>
     </div>
 

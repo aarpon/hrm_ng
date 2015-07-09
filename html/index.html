@@ -39,13 +39,22 @@
     <link type="text/css" media="all" rel="stylesheet" />
 </head>
 <body ng-app="hrmApp" ng-controller="mainController">
+<md-content>
 <div layout="column" layout-align="center center">
-    <div flex>
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <md-button ng-hide="currentUser==null" ng-click="logout()" aria-label="Logout">Logout</md-button>
+            <h2>{{currentUser}}</h2>
+        </div>
+    </md-toolbar>
+    <md-content layout-padding style="height: 600px;padding: 24px;">
         <h1 class="md-display-1" style="text-align: center">Welcome to the New and Improved Huygens Remote Manager!</h1>
-    </div>
+        <div class="ng-view"></div>
+    </md-content>
 
-    <div class="ng-view"></div>
+
 </div>
+</md-content>
 </body>
 
 

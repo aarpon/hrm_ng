@@ -2,7 +2,10 @@
  * Created by oburri on 02.07.15.
  */
 hrmapp.controller('loginController', function($scope, $location, $rootScope, $mdDialog, authService, AUTH_EVENTS, LOG_EVENTS, $mdToast) {
-
+    $scope.credentials = {
+        username: 'testUser',
+        password: 'testPwd'
+    }
     $scope.loginUser = function(credentials) {
         authService.loginUser(credentials).then(function (user) {
             $scope.setCurrentUser(user);
@@ -30,7 +33,7 @@ hrmapp.controller('loginController', function($scope, $location, $rootScope, $md
     $scope.showNewUserForm = function(ev) {
         $mdDialog.show({
             controller: newUserFormController,
-            templateUrl: 'templates/new-user.html',
+            templateUrl: 'templates/new-user-template.html',
             parent: angular.element(document.body),
             targetEvent: ev
         })
@@ -40,7 +43,7 @@ hrmapp.controller('loginController', function($scope, $location, $rootScope, $md
             }, function() {
                 $mdToast.show(
                     $mdToast.simple()
-                        .content('Cancelled')
+                        .content('New Form Cancelled')
                         .position("top right")
                         .hideDelay(2000)
                 );
