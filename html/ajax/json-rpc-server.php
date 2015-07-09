@@ -212,7 +212,7 @@ function __initJSONArray()
 function __isSessionActive($client_session_id) {
 
     // Initialize output
-    $status = array("can_run" => false, "message" => "");
+    $status = array("can_run" => true, "message" => "");
 
     // Check if the ID exists in the session
     if ($client_session_id != session_id()) {
