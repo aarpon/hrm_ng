@@ -1,8 +1,7 @@
-<div id="login-form">
-    <section layout="row" layout-sm="column"  layout-align="center center">
+<div id="login-form" layout="row" layout-sm="column"  layout-align="center center">
 
         <form name="userForm">
-            <div layout>
+            <div>
                 <md-input-container>
                     <label>Username</label>
                     <input ng-model="credentials.username">
@@ -13,12 +12,11 @@
                 </md-input-container>
 
             </div>
-            <div layout-align="left">
+            <div>
                 <md-button ng-click="loginUser(credentials)"><i class="mdi login"></i>Login</md-button>
                 <md-button ng-click="showNewUserForm($event)">Create Account</md-button>
             </div>
         </form>
-</section>
 
     <pre>{{credentials | json}}</pre>
     <pre>{{newuser | json}}</pre>

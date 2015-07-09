@@ -1,32 +1,20 @@
 /**
  * Created by oburri on 02.07.15.
  */
-hrmapp.controller('loginController', function($scope, $location, $rootScope, $mdDialog, authService, AUTH_EVENTS, LOG_EVENTS, $mdToast) {
+hrmapp.controller('loginController', function($scope, $location, $rootScope, $mdDialog, authService, AUTH_EVENTS, LOG_EVENTS, toastService) {
     $scope.credentials = {
-        username: 'testUser',
-        password: 'testPwd'
+        username: 'TestUser',
+        password: 'TestPassword'
     }
     $scope.loginUser = function(credentials) {
-        authService.loginUser(credentials).then(function (user) {
-            $scope.setCurrentUser(user);
-            $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
-
-            $mdToast.show(
-                $mdToast.simple()
-                    .content('Successful Login')
-                    .position("top right")
-                    .hideDelay(5000)
-            );
-            $location.path('main');
+        authService.loginUser(credentials).then(function () {
+            toastService.showMessage('Login Successful');
+            $location.path('/main');
 
         }, function (errorMessage) {
             $rootScope.$broadcast(AUTH_EVENTS.loginFailed);
-            $mdToast.show(
-                $mdToast.simple()
-                    .content('Failed:'+errorMessage)
-                    .position("top right")
-                    .hideDelay(2000)
-            );
+            toastService.showMessage('Login Failed: '+errorMessage);
+
         });
     };
 
@@ -41,15 +29,11 @@ hrmapp.controller('loginController', function($scope, $location, $rootScope, $md
                 $scope.newuser = newuserinfo;
                 // Submit here to the server
             }, function() {
-                $mdToast.show(
-                    $mdToast.simple()
-                        .content('New Form Cancelled')
-                        .position("top right")
-                        .hideDelay(2000)
-                );
+                toastService.showMessage('New User Form Cancelled');
             });
     };
 });
+
 function newUserFormController($scope, $mdDialog, ajaxService) {
 
     $scope.cancel = function() {

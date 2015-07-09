@@ -3,7 +3,7 @@
  * This service handles logging the user in and out
  */
 
-hrmapp.factory('authService', function( ajaxService, hrmSession ) {
+hrmapp.factory('authService', function( $rootScope, ajaxService, hrmSession, AUTH_EVENTS ) {
 
     var authService = {};
 
@@ -13,8 +13,26 @@ hrmapp.factory('authService', function( ajaxService, hrmSession ) {
             .then(function (res) {
                 if (res.result.success) {
                     hrmSession.create(user.username, res.result.id, res.result.result.role);
-                    return user.username; // give the user name back.
+                    $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
+
                 } else{
+                    $rootScope.$broadcast(AUTH_EVENTS.loginFailed);
+                    return ($q.reject(res.message))
+                }
+
+            });
+    };
+
+    authService.logoutUser = function() {
+
+        return ajaxService.sendRequest('logOut')
+            .then(function (res) {
+                if (res.result.success) {
+                    hrmSession.destroy();
+                    $rootScope.$broadcast(AUTH_EVENTS.logoutSuccess);
+
+                } else{
+                    $rootScope.$broadcast(AUTH_EVENTS.logoutFailed);
                     return ($q.reject(res.message))
                 }
 
@@ -23,7 +41,7 @@ hrmapp.factory('authService', function( ajaxService, hrmSession ) {
 
 
     authService.isAuthenticated = function() {
-        return hrmSession.sessionID;
+        return hrmSession.sessionId != -1;
     };
 
     authService.isAuthorized = function(authorizedRoles) {

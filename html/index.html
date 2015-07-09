@@ -24,32 +24,34 @@
 
 
     <script type='text/javascript' src='scripts/angular/hrmApp.js'></script>
-    <script type='text/javascript' src='scripts/angular/controllers/mainController.js'></script>
     <script type='text/javascript' src='scripts/angular/providers/routes.js'></script>
+
+    <script type='text/javascript' src='scripts/angular/controllers/mainController.js'></script>
+    <script type='text/javascript' src='scripts/angular/controllers/mainPageController.js'></script>
 
     <script type='text/javascript' src='scripts/angular/controllers/loginController.js'></script>
     <script type='text/javascript' src='scripts/angular/providers/authService.js'></script>
     <script type='text/javascript' src='scripts/angular/providers/ajaxService.js'></script>
     <script type='text/javascript' src='scripts/angular/providers/hrmSession.js'></script>
     <script type='text/javascript' src='scripts/angular/providers/hrmInterceptor.js'></script>
-    <script type='text/javascript' src='scripts/angular/providers/uiLogService.js'></script>
+    <script type='text/javascript' src='scripts/angular/providers/toastService.js'></script>
     <script type='text/javascript' src='scripts/angular/directives/pwCheckDirective.js'></script>
     <script type='text/javascript' src='scripts/angular/hrmConstants.js'></script>
 
     <link type="text/css" media="all" rel="stylesheet" />
 </head>
-<body ng-app="hrmApp" ng-controller="mainController">
-<md-content>
+<body ng-app="hrmApp" >
+<md-content ng-controller="mainController">
 <div layout="column" layout-align="center center">
     <md-toolbar>
         <div class="md-toolbar-tools">
-            <md-button ng-hide="currentUser==null" ng-click="logout()" aria-label="Logout">Logout</md-button>
-            <h2>{{currentUser}}</h2>
+            <md-button ng-hide="currentUser==null" ng-click="logout()" aria-label="Logout" class="md-raised">Logout</md-button>
+            <h2 ng-hide="currentUser==null">Welcome {{currentUser}}! You are a {{currentRole}}</h2>
         </div>
     </md-toolbar>
-    <md-content layout-padding style="height: 600px;padding: 24px;">
+    <md-content layout-padding style="width:150px padding: 24px;">
         <h1 class="md-display-1" style="text-align: center">Welcome to the New and Improved Huygens Remote Manager!</h1>
-        <div class="ng-view"></div>
+        <ng-view></ng-view>
     </md-content>
 
 

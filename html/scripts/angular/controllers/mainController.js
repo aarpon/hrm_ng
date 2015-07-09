@@ -2,18 +2,31 @@
  * Created by oburri on 03.07.15.
  */
 
-hrmapp.controller('mainController', function ($scope, USER_ROLES, authService) {
-
-    /*
-     These variables and methods are all assigned to the $scope
-     and thus should NOT be accessed by controllers, only templates!
-      */
+hrmapp.controller('mainController', function ($scope, $rootScope, $location, AUTH_EVENTS, hrmSession, authService, toastService) {
 
     $scope.currentUser = null;
-    $scope.userRoles = USER_ROLES;
-    $scope.isAuthorized = authService.isAuthorized;
+    $scope.currentRole = null;
 
-    $scope.setCurrentUser = function (user) {
-        $scope.currentUser = user;
+    $scope.logout = function () {
+        authService.logoutUser().then(function () {
+            toastService.showMessage('Logout Sucessful');
+
+            $location.path('/login');
+
+        }, function (errorMessage) {
+            toastService.showMessage('Logout Failed: '+errorMessage);
+        });
     };
+
+    $rootScope.$on(AUTH_EVENTS.loginSuccess, function() {
+        $scope.currentUser = hrmSession.userName;
+        $scope.currentRole = hrmSession.userRole;
+
+    });
+
+    $rootScope.$on(AUTH_EVENTS.logoutSuccess, function() {
+        $scope.currentUser = null;
+        $scope.currentRole = null;
+
+    });
 });

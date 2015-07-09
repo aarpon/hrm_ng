@@ -4,8 +4,8 @@
 
 hrmapp.service('hrmSession', function() {
     this.sessionId = -1;
-    this.userName = "";
-    this.userRole = "";
+    this.userName = null;
+    this.userRole = null;
 
     this.create = function (userName, sessionId, userRole) {
         this.userName = userName;
@@ -14,9 +14,9 @@ hrmapp.service('hrmSession', function() {
     };
 
     this.destroy = function () {
-        this.userName = userName;
-        this.sessionId = sessionId;
-        this.userRole = userRole;
+        this.userName = null;
+        this.sessionId = -1;
+        this.userRole = null;
     };
 
     this.getSessionId = function() {
