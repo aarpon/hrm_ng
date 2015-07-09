@@ -11,15 +11,12 @@ hrmapp.factory('authService', function( $rootScope, ajaxService, hrmSession, AUT
 
         return ajaxService.sendRequest('logIn', user)
             .then(function (res) {
-                if (res.result.success) {
-                    hrmSession.create(user.username, res.result.id, res.result.result.role);
+                    hrmSession.create(user.username, res.id, res.result.role);
                     $rootScope.$broadcast(AUTH_EVENTS.loginSuccess);
 
-                } else{
-                    $rootScope.$broadcast(AUTH_EVENTS.loginFailed);
-                    return ($q.reject(res.message))
-                }
-
+            }, function (errorMessage) {
+                $rootScope.$broadcast(AUTH_EVENTS.loginFailed);
+                return (errorMessage)
             });
     };
 
@@ -27,14 +24,11 @@ hrmapp.factory('authService', function( $rootScope, ajaxService, hrmSession, AUT
 
         return ajaxService.sendRequest('logOut')
             .then(function (res) {
-                if (res.result.success) {
-                    hrmSession.destroy();
-                    $rootScope.$broadcast(AUTH_EVENTS.logoutSuccess);
-
-                } else{
+                hrmSession.destroy();
+                $rootScope.$broadcast(AUTH_EVENTS.logoutSuccess);
+            }, function(errorMessage) {
                     $rootScope.$broadcast(AUTH_EVENTS.logoutFailed);
-                    return ($q.reject(res.message))
-                }
+                    return (errorMessage)
 
             });
     };
