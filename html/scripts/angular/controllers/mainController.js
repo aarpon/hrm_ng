@@ -9,7 +9,7 @@ hrmapp.controller('mainController', function ($scope, $rootScope, $location, AUT
 
     $scope.logout = function () {
         authService.logoutUser().then(function () {
-            toastService.showMessage('Logout Sucessful');
+            toastService.showMessage('Logout Successful');
 
             $location.path('/login');
 
