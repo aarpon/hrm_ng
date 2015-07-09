@@ -167,24 +167,34 @@ return true;
  *            subsequent operations. Following the JSON RPC 2.0 specifications, the id
  *            received from the client MUST be returned to the client.
  *            The function initializes it to -1 (invalid session id).
- * "success": whether the call was successful (boolean true) or not (false).
- *            Defaults to false.
- * "message": typically an error message to be displayed or parsed by the client
- *            in case "success" is false.
  * "result" : encapsulates the actual result from the call.
+ * "error":   (boolean) if true, it indicates that the call could not be execute for one
+ *            of the following reasons:
+ *            - there is no active session (i.e. no user is logged in)
+ *            - the user's privileges are not high enough (e.g. a normal user tries to
+ *              execute a call that requires administrator privileges)
+ *            - something unexpected happened (e.g. the database server is unreachable)
+ *            Do not use “error” to indicate an expected event such as failed authentication
+ *            (e.g. because the password was wrong, or because the user does not exist in
+ *            the database).
+ *            Defaults to false.
+ * "message": string containing a human-friendly answer to the method (e.g. “The user was
+ *            logged in successfully.” In case of “error”, use “message” to return an
+ *            explanation of what went wrong (e.g. "User is not allowed to delete another user.",
+ *            “Fatal error: database not reachable”, or “Fatal error: disk is full”, …).
  *
  * Before the method functions return, they must call json_encode() on it!
  *
  * @return Array (PHP) with "id" => -1, "result" => "",
- *         "success" => false and "message" => "" properties.
+ *         "error" => false and "message" => "" properties.
  */
 function __initJSONArray()
 {
-    // Initialize the JSON array with failure
+    // Initialize the JSON array
     return (array(
             "id" => -1,
             "result" => "",
-            "success" => false,
+            "error" => false,
             "message" => ""));
 }
 
@@ -202,29 +212,29 @@ function __initJSONArray()
 function __isSessionActive($client_session_id) {
 
     // Initialize output
-    $result = array("can_run" => true, "message" => "");
+    $status = array("can_run" => false, "message" => "");
 
     // Check if the ID exists in the session
     if ($client_session_id != session_id()) {
 
         // The User is not logged in and there is no active session.
-        $result["can_run"] = false;
-        $result["message"] = "Invalid session id.";
+        $status["can_run"] = false;
+        $status["message"] = "Invalid session id.";
 
-        return $result;
+        return $status;
     }
 
     // Check that the session has a User ID
     if (! array_key_exists('UserID', $_SESSION)) {
 
         // The User ID was not found in the PHP session.
-        $result["can_run"] = false;
-        $json["message"] = "The user does not exist.";
+        $status["can_run"] = false;
+        $status["message"] = "The user does not exist.";
 
-        return $result;
+        return $status;
     }
 
-    return $result;
+    return $status;
 }
 
 /**
@@ -301,8 +311,8 @@ function __setSuccess($id, $result = "", $message = "")
 
     // Fill
     $json['id'] = $id;
-    $json['success'] = true;
     $json['result'] = $result;
+    $json['error'] = false;
     $json['message'] = $message;
 
     // Return it
@@ -326,8 +336,8 @@ function __setFailure($id, $result = "", $message = "")
 
     // Fill
     $json['id'] = $id;
-    $json['success'] = false;
     $json['result'] = $result;
+    $json['error'] = true;
     $json['message'] = $message;
 
     // Return it
@@ -351,18 +361,18 @@ function __setFailure($id, $result = "", $message = "")
 function logIn($username, $password) {
 
     // Prepare the result
-    $result = array("success" => null, "role" => null);
+    $result = array("loggedIn" => false, "role" => null);
 
     // Query the User
     $user = UserQuery::create()->findOneByName($username);
     if (null === $user) {
 
         // Fill the result array
-        $result["success"] = false;
+        $result["loggedIn"] = false;
         $result["role"] = null;
 
         // The User does not exist!
-        return json_encode(__setFailure(-1, $result,
+        return json_encode(__setSuccess(-1, $result,
                 "The user does not exist."));
 
     }
@@ -379,7 +389,7 @@ function logIn($username, $password) {
         session_start();
 
         // Fill in the result array
-        $result["success"] = true;
+        $result["loggedIn"] = true;
         $result["role"] = $user->getRole();
 
         // Successful login
@@ -392,12 +402,12 @@ function logIn($username, $password) {
     } else {
 
         // Fill in the result array
-        $result["success"] = false;
+        $result["loggedIn"] = false;
         $result["role"] = null;
 
         // Fill the JSON array
         $json = __setSuccess(-1, $result,
-                "The user could not be logged in.");
+                "The user could not be authenticated.");
 
     }
 
@@ -405,23 +415,39 @@ function logIn($username, $password) {
     return (json_encode($json));
 }
 
+/**
+ * Logs out the user.
+ * @param $client_session_id String|integer Session ID
+ * @return string JSON object.
+ */
 function logOut($client_session_id) {
 
+    // Prepare the result
+    $result = array("loggedOut" => true, "previousId" => -1);
+
     // Check the session and the User login state
-    $result = __isSessionActive($client_session_id);
-    if (! $result['can_run']) {
+    $status = __isSessionActive($client_session_id);
+    if (! $status['can_run']) {
+
+        // Fill in the result
+        $result["loggedOut"] = true;
+        $result["previousId"] = -1;
 
         // Report failure
-        $json = __setFailure(-1, false, $result['message']);
+        $json = __setFailure(-1, $result, $status['message']);
 
     } else {
+
+        // Fill in the result
+        $result["loggedOut"] = true;
+        $result["previousId"] = $client_session_id;
 
         // Destroy current session
         session_unset();
         session_destroy();
 
         // Report success
-        $json = __setSuccess(-1, true,
+        $json = __setSuccess(-1, $result,
                 "The user was logged out successfully.");
 
     }
@@ -449,22 +475,31 @@ function logOut($client_session_id) {
  */
 function isLoggedIn($client_session_id) {
 
+    // Initialize result
+    $result = array("isLoggedIn" => false);
+
     // Check the session and the User login state
-    $result = __isSessionActive($client_session_id);
-    if (! $result['can_run']) {
+    $status = __isSessionActive($client_session_id);
+    if (! $status['can_run']) {
+
+        $result["isLoggedIn"] = false;
 
         // Report failure
-        $json = __setFailure(-1, false, $result['message']);
+        $json = __setFailure(-1, $result, $status['message']);
 
     } else {
 
         if (! __isMethodAllowed("isLoggedIn")) {
 
+            $result["isLoggedIn"] = false;
+
             // Report failure
-            $json = __setFailure(-1, false,
+            $json = __setFailure(-1, $result,
                     "The user is not allowed to perform this operation.");
 
         } else {
+
+            $result["isLoggedIn"] = true;
 
             // Report success
             $json = __setSuccess($client_session_id, true,
