@@ -9,15 +9,14 @@
         </div>
     </md-toolbar>
 
-
     <md-dialog-content>
         <form name="newUSer">
             <md-input-container>
                 <label>Username</label>
-                <input md-maxlength  name="username" required ng-model="user.username">
+                <input md-maxlength="30"  name="username" required ng-model="user.username">
                 <div ng-messages="newUSer.username.$error">
                     <div ng-message="required">Required field.</div>
-                    <div ng-message="md-maxlength">Your username should be less than 30 characters long.</div>
+                    <div ng-message="md-maxlength">Username too long.</div>
                 </div>
             </md-input-container>
             <md-input-container>
