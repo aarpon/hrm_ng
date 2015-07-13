@@ -39,7 +39,7 @@ hrmapp.factory('authService', function( $rootScope, ajaxService, hrmSession, AUT
     };
 
     authService.isAuthorized = function(authorizedRoles) {
-        if (!angular.asArray(authorizedRoles)) {
+        if (!angular.isArray(authorizedRoles)) {
             authorizedRoles = [authorizedRoles];
         }
         return (authService.isAuthenticated() && authorizedRoles.indexOf(hrmSession.userRole) !== -1);

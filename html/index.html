@@ -24,19 +24,23 @@
 
 
     <script type='text/javascript' src='scripts/angular/hrmApp.js'></script>
-    <script type='text/javascript' src='scripts/angular/providers/routes.js'></script>
+    <script type='text/javascript' src='scripts/angular/hrmConstants.js'></script>
+
 
     <script type='text/javascript' src='scripts/angular/controllers/mainController.js'></script>
     <script type='text/javascript' src='scripts/angular/controllers/mainPageController.js'></script>
+    <script type='text/javascript' src='scripts/angular/controllers/userManagerController.js'></script>
 
     <script type='text/javascript' src='scripts/angular/controllers/loginController.js'></script>
     <script type='text/javascript' src='scripts/angular/providers/authService.js'></script>
     <script type='text/javascript' src='scripts/angular/providers/ajaxService.js'></script>
     <script type='text/javascript' src='scripts/angular/providers/hrmSession.js'></script>
-    <script type='text/javascript' src='scripts/angular/providers/hrmInterceptor.js'></script>
+    <script type='text/javascript' src='scripts/angular/interceptors/hrmInterceptor.js'></script>
+    <script type='text/javascript' src='scripts/angular/interceptors/http-auth-interceptor.js'></script>
     <script type='text/javascript' src='scripts/angular/providers/toastService.js'></script>
     <script type='text/javascript' src='scripts/angular/directives/pwCheckDirective.js'></script>
-    <script type='text/javascript' src='scripts/angular/hrmConstants.js'></script>
+    <script type='text/javascript' src='scripts/angular/providers/routes.js'></script>
+
 
     <link type="text/css" media="all" rel="stylesheet" />
 </head>
@@ -45,8 +49,21 @@
 <div layout="column" layout-align="center center">
     <md-toolbar>
         <div class="md-toolbar-tools">
-            <md-button ng-hide="currentUser==null" ng-click="logout()" aria-label="Logout" class="md-raised">Logout</md-button>
+            <md-button ng-show="isLoggedIn()" ng-click="logout()" aria-label="Logout" class="md-raised">Logout</md-button>
             <h2 ng-hide="currentUser==null">Welcome {{currentUser}}! You are a {{currentRole}}</h2>
+            <span flex></span>
+            <div layout="column" flex-sm="100" flex="33" layout-align="center center">
+                <md-menu md-position-mode="target-right target">
+                    <md-button ng-show="isAdmin()" aria-label="HRM Management" class="md-raised md-warn" ng-click="$mdOpenMenu()">Management Tools</md-button>
+                    <md-menu-content width="3">
+                        <md-menu-item ng-repeat="mgmtMenu in managementOptions">
+                            <md-button ng-click="switchView(mgmtMenu.view)">
+                                <p>{{mgmtMenu.name}}</p>
+                            </md-button>
+                        </md-menu-item>
+                    </md-menu-content>
+                </md-menu>
+            </div>
         </div>
     </md-toolbar>
     <md-content layout-padding style="width:150px padding: 24px;">

@@ -12,7 +12,7 @@ hrmapp.constant('AUTH_EVENTS', {
 });
 
 hrmapp.constant('USER_ROLES', {
-    all: '*',
+    everyone: '*',
     admin: 'admin',
     user: 'user',
     manager: 'manager'
