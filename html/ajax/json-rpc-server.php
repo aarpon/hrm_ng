@@ -129,6 +129,17 @@ switch ($method) {
         $json = logOut($clientID);
         break;
 
+    case "addUser":
+
+        // Make sure the expected parameters exist
+        if (!(array_key_exists('username', $params) &&
+            array_key_exists('password', $params))) {
+            die("Invalid arguments.");
+        }
+
+        $json = logIn($params["username"], $params["password"]);
+        break;
+
     case "isLoggedIn":
 
         // isLoggedIn does not take additional parameters.
@@ -141,8 +152,10 @@ switch ($method) {
         die("Unknown method.");
 }
 
-// Return the JSON object
-header("Content-Type: application/json", true);
+// Return the JSON object in an HTTP/1.1 response.
+header("HTTP/1.1 200 OK");
+header("Content-type: application/json;charset=utf8", true);
+header("Content-length: " . mb_strlen($json));
 echo $json;
 
 return true;
@@ -268,7 +281,9 @@ function __isMethodAllowed($methodName) {
         }
 
         // Define the minimum roles
-        $methodRoles = array("addUser" => 3); // TODO: Example!!
+
+        // addUser: allowed user roles: manager and admin
+        $methodRoles = array("addUser" => 2);
 
         // Compare the role requirements
         if (array_key_exists($methodName, $methodRoles)) {
