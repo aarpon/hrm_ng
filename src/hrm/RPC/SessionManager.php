@@ -49,7 +49,7 @@ class SessionManager
     /**
      * Set a key-value pair in the Session
      * @param $key string Key
-     * @param $val Any Value
+     * @param $val string|int Value
      */
     public function set($key, $val)
     {
@@ -112,5 +112,14 @@ class SessionManager
     public function getSessionID()
     {
         return session_id();
+    }
+
+    /**
+     * Return the last message.
+     * @return string The last message.
+     */
+    public function lastMessage()
+    {
+        return $this->lastMessage;
     }
 }

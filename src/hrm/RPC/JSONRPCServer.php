@@ -131,15 +131,15 @@ class JSONRPCServer
      *            role required for running it.§
      */
     private static $VALID_METHODS = array(
-        "logIn"   => 0,           // Everyone
-        "logOut"  => 0,           // Everyone
-        "addUser" => 1);          // Manager or higher
+        "logIn"      => 0,        // Everyone
+        "logOut"     => 0,        // Everyone
+        "addUser"    => 1,        // Manager or higher
+        "deleteUser" => 1);       // Manager or higher
 
     /**
      * Constructor
      * @param $request Array JSON RPC request from the client converted to
      * a PHP array.
-     * @param $phpSessionID string Currently active session ID.
      *
      * The session ID must be retrieved from $_SESSION and passed
      * on as argument to the constructor.
@@ -375,7 +375,7 @@ class JSONRPCServer
     /**
      * Check if the parameters for currently set method are valid.
      * @return bool True if the parameters are valid, false otherwise.
-     * @throws Exception if the requested method is invalid. This should not
+     * @throws \Exception if the requested method is invalid. This should not
      * happen, since the call to areParametersValid() should follow a call to
      * isMethodValid().
      */
@@ -404,7 +404,7 @@ class JSONRPCServer
             default:
 
                 // Unknown method. This is a bug!
-                throw new Exception("Invalid method requested!");
+                throw new \Exception("Invalid method requested!");
         }
     }
 
@@ -504,21 +504,27 @@ class JSONRPCServer
      * METHOD IMPLEMENTATIONS
      *
      */
+
+    /**
+     * Method: User log in
+     * @throws \Exception
+     * @throws \Propel\Runtime\Exception\PropelException
+     */
     private function logIn()
     {
         // Prepare the result
-        $result = array("success" => null, "role" => null);
+        $result = array("loggedIn" => null, "role" => null);
 
         // Query the User
         $user = UserQuery::create()->findOneByName($this->params["username"]);
         if (null === $user) {
 
             // Fill the result array
-            $result["success"] = false;
+            $result["loggedIn"] = false;
             $result["role"] = null;
 
             // The User does not exist!
-            $this->setFailure(-1, $result, "The user does not exist.",
+            $this->setSuccess(-1, $result, "The user does not exist.",
                 "401 Unauthorized");
 
         }
@@ -530,7 +536,7 @@ class JSONRPCServer
             $this->sessionManager->restart();
 
             // Fill in the result array
-            $result["success"] = true;
+            $result["loggedIn"] = true;
             $result["role"] = $user->getRole();
 
             // Successful login
@@ -545,11 +551,10 @@ class JSONRPCServer
         } else {
 
             // Fill in the result array
-            $result["success"] = false;
+            $result["loggedIn"] = false;
             $result["role"] = null;
 
             // Set success (although the user could not be authenticated).
-            // TODO: Set http response status
             $this->setSuccess(-1, $result,
                 "The user could not be logged in.",
                 "401 Unauthorized");
@@ -557,29 +562,39 @@ class JSONRPCServer
     }
 
     /**
-     * Log out current User
+     * Method: User log out
      * @return bool True if the User could be logged out; false otherwise.
      */
     private function logOut()
     {
+        // Prepare the result
+        $result = array("loggedOut" => null, "previousId" => null);
+
         // Is the session active?
         if (! $this->sessionManager->isActive($this->clientId))
         {
+            // Update result
+            $result["loggedOut"] = true;
+            $result["previousId"] = -1;
+
             // The session was not active and/or no User was logged in.
-            $this->setFailure(-1, false,
+            $this->setFailure(-1, $result,
                 $this->sessionManager->lastMessage(),
                 "400 Bad request");
 
         } else {
 
+            // Update result
+            $result["loggedOut"] = true;
+            $result["previousId"] = session_id();
+
             // Destroy current session
             $this->sessionManager->destroy();
 
             // Report success
-            $this->setSuccess(-1, true,
+            $this->setSuccess(-1, $result,
                 "The user was logged out successfully.",
                 "200 OK");
-
         }
     }
 
