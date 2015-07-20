@@ -17,7 +17,7 @@ $user->setPasswordHash("TestPassword");
 $user->setEmail("test@email.com");
 $user->setResearchGroup("TestGroup");
 $user->setAuthentication("integrated");
-$user->setRole("user");
+$user->setRole("manager");
 $user->setCreationDate(new DateTime());
 $user->setLastAccessDate(new DateTime());
 $user->setStatus("active");

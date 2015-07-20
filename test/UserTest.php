@@ -62,7 +62,7 @@ class UserTest extends PHPUnit_Framework_TestCase
         $user->setEmail("test@email.com");
         $user->setResearchGroup("TestGroup");
         $user->setAuthentication("integrated");
-        $user->setRole("user");
+        $user->setRole("manager");
         $user->setCreationDate(new DateTime());
         $user->setLastAccessDate(new DateTime());
         $user->setStatus("active");
@@ -151,5 +151,18 @@ class UserTest extends PHPUnit_Framework_TestCase
 
         # Now try logging the User in
         $this->assertTrue($user->logIn("TestPassword") === true);
+    }
+
+    /**
+     * Test the role of the User.
+     */
+    public function testUserRole()
+    {
+        # Get the User
+        $user = \hrm\User\UserQuery::create()->findOneByName("TestUser");
+        $this->assertTrue(null !== $user);
+
+        # Make sure the User is a manager
+        $this->assertTrue($user->getRole() === "manager");
     }
 }
