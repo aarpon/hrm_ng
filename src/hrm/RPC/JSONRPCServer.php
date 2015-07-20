@@ -167,6 +167,15 @@ class JSONRPCServer
      */
     public function executeRequest()
     {
+        // Can the user execute the method?
+        if (! $this->canUserRunMethod())
+        {
+            $this->setFailure(-1, array(),
+                "The user is not allowed to run this method.",
+                "401 Method Not Allowed");
+            return;
+        }
+
         // Call the method
         $this->{$this->method}();
     }
@@ -404,10 +413,10 @@ class JSONRPCServer
      * the requested method.
      * @return bool True if the user can run the method, false otherwise.
      */
-    private function userCanRunMethod()
+    private function canUserRunMethod()
     {
         // The logIn and logOut methods can always be run
-        if ($this->methodName == "logIn" || $this->methodName == "logOut") {
+        if ($this->method == "logIn" || $this->method == "logOut") {
             return true;
         }
 
@@ -509,7 +518,8 @@ class JSONRPCServer
             $result["role"] = null;
 
             // The User does not exist!
-            $this->setFailure(-1, $result, "The user does not exist.");
+            $this->setFailure(-1, $result, "The user does not exist.",
+                "401 Unauthorized");
 
         }
 
@@ -526,7 +536,8 @@ class JSONRPCServer
             // Successful login
             // TODO: Set http response status
             $this->setSuccess($this->sessionManager->getSessionID(), $result,
-                "The user was logged in successfully.");
+                "The user was logged in successfully.",
+                "200 OK");
 
             // Store the User ID in the PHP session
             $this->sessionManager->set('UserID', $user->getId());
@@ -540,8 +551,8 @@ class JSONRPCServer
             // Set success (although the user could not be authenticated).
             // TODO: Set http response status
             $this->setSuccess(-1, $result,
-                "The user could not be logged in.");
-
+                "The user could not be logged in.",
+                "401 Unauthorized");
         }
     }
 
