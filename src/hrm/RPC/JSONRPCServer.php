@@ -282,9 +282,6 @@ class JSONRPCServer
         // it should be set to -1.
         if (!(array_key_exists('id', $this->httpRequest))) {
 
-            // Session ID missing
-            $this->lastError = "Session ID is missing!";
-
             // Flag invalid
             $this->isRequestValid = false;
 
