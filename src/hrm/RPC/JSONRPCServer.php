@@ -16,7 +16,8 @@ This is an example Javascript code to interface with json-rpc-server.php:
 09:        }));
 10:    </script>
 
-Passing parameters to the Ajax method is very flexible (line 5). The recommended method is:
+Passing parameters to the Ajax method is very flexible (line 5). The recommended
+method is:
 
                   params : {parameter : 'value'}
 
@@ -53,6 +54,7 @@ PHP:          $params[0] := "ExcitationWavelength"
 
 namespace hrm\RPC;
 use hrm\User\Base\UserQuery;
+use hrm\User\User;
 
 require_once dirname(__FILE__) . '/../../bootstrap.php';
 
@@ -128,13 +130,28 @@ class JSONRPCServer
     /**
      * @const
      * @var array Array of known and valid methods with the minimum user
-     *            role required for running it.§
+     *            role required for running it.
      */
     private static $VALID_METHODS = array(
         "logIn"      => 0,        // Everyone
         "logOut"     => 0,        // Everyone
         "addUser"    => 1,        // Manager or higher
         "deleteUser" => 1);       // Manager or higher
+
+    /**
+     * @const
+     * @var array Array of status codes for the HTTP/1.1 response.
+     *            The key is the numeric code, the value is the complete
+     *            status to be packed in the header.
+     *
+     * @see setResponseToSuccess, setResponseToFailure
+     */
+    private static $RESPONSE_STATUS_CODES = array(
+        200 => "200 OK",
+        400 => "400 Bad Request",
+        401 => "401 Unauthorized",
+        405 => "405 Method Not Allowed",
+        500 => "500 Internal Server Error");
 
     /**
      * Constructor
@@ -170,9 +187,11 @@ class JSONRPCServer
         // Can the user execute the method?
         if (! $this->canUserRunMethod())
         {
-            $this->setFailure(-1, array(),
+            $this->setResponseToFailure(
+                -1,
+                array(),
                 "The user is not allowed to run this method.",
-                "401 Method Not Allowed");
+                405);
             return;
         }
 
@@ -279,8 +298,11 @@ class JSONRPCServer
             $this->isRequestValid = false;
 
             // Set the response to failure
-            $this->setFailure(-1, array(), "Invalid JSON-RPC 2.0 call.",
-                "400 Bad Request");
+            $this->setResponseToFailure(
+                -1,
+                array(),
+                "Invalid JSON-RPC 2.0 call.",
+                400);
 
             // Return here
             return;
@@ -295,8 +317,11 @@ class JSONRPCServer
             $this->isRequestValid = false;
 
             // Set the response to failure
-            $this->setFailure(-1, array(), "Session ID is missing!",
-                "400 Bad Request");
+            $this->setResponseToFailure(
+                -1,
+                array(),
+                "Session ID is missing!",
+                400);
 
             // Return here
             return;
@@ -312,8 +337,11 @@ class JSONRPCServer
             $this->isRequestValid = false;
 
             // Set the response to failure
-            $this->setFailure(-1, array(), "Method missing!",
-                "400 Bad Request");
+            $this->setResponseToFailure(
+                -1,
+                array(),
+                "Method missing!",
+                400);
 
             // Return here
             return;
@@ -329,8 +357,11 @@ class JSONRPCServer
             $this->isRequestValid = false;
 
             // Set the response to failure
-            $this->setFailure(-1, array(), "Invalid method!",
-                "400 Bad Request");
+            $this->setResponseToFailure(
+                -1,
+                array(),
+                "Invalid method!",
+                400);
 
             // Return here
             return;
@@ -350,8 +381,11 @@ class JSONRPCServer
                 $this->isRequestValid = false;
 
                 // Set the response to failure
-                $this->setFailure(-1, array(), "Invalid parameters!",
-                    "400 Bad Request");
+                $this->setResponseToFailure(
+                    -1,
+                    array(),
+                    "Invalid parameters!",
+                    400);
 
                 // Return here
                 return;
@@ -398,8 +432,17 @@ class JSONRPCServer
             case "addUser":
 
                 // Make sure the expected parameters exist
-                // TODO: Complete
-                return false;
+                return (array_key_exists('username', $this->params) &&
+                    array_key_exists('password', $this->params) &&
+                    array_key_exists('email', $this->params) &&
+                    array_key_exists('research_group', $this->params) &&
+                    array_key_exists('role', $this->params) &&
+                    array_key_exists('password', $this->params));
+
+            case "deleteUser":
+
+                // deleteUser only needs 'username'
+                return (array_key_exists('username', $this->params));
 
             default:
 
@@ -455,12 +498,12 @@ class JSONRPCServer
      * @param $id string|integer Session ID
      * @param $result Array Result from the method call.
      * @param $message string Message returned by the method call.
-     * @param string $responseStatus HTTP/1.1 response status. Default for
-     *               success is "200 OK".
+     * @param int $responseCode HTTP/1.1 response status. Default for
+     *               success is 200.
      * @return Array JSON object.
      */
-    private function setSuccess($id, $result = array(), $message = "",
-                                $responseStatus = "200 OK")
+    private function setResponseToSuccess($id, $result = array(), $message = "",
+                                          $responseCode = 200)
     {
         // Initialize and fill the array
         $this->httpResponseArray = array(
@@ -470,23 +513,23 @@ class JSONRPCServer
             "message" => $message);
 
         // Set the response code
-        $this->httpResponseStatus = $responseStatus;
+        $this->httpResponseStatus = self::$RESPONSE_STATUS_CODES[$responseCode];
     }
 
     /**
      * Fills the response array in case of failure.
      *
-     * @see setSuccess for a definition of success and failure of a method call.
+     * @see setResponseToSuccess for a definition of success and failure of a method call.
      *
      * @param $id string|integer Session ID
      * @param $result Array Result from the method call.
      * @param $message string Message returned by the method call.
-     * @param string $responseStatus HTTP/1.1 response status. Default for
-     *               failure is "400 Bad Request".
+     * @param int $responseCode HTTP/1.1 response status. Default for
+     *               failure is 400.
      * @return Array JSON object.
      */
-    function setFailure($id, $result = array(), $message = "",
-                        $responseStatus = "400 Bad Request")
+    function setResponseToFailure($id, $result = array(), $message = "",
+                                  $responseCode = 400)
     {
         // Initialize and fill the array
         $this->httpResponseArray = array(
@@ -496,7 +539,7 @@ class JSONRPCServer
             "message" => $message);
 
         // Set the response code
-        $this->httpResponseStatus = $responseStatus;
+        $this->httpResponseStatus = self::$RESPONSE_STATUS_CODES[$responseCode];
     }
 
     /*
@@ -524,8 +567,11 @@ class JSONRPCServer
             $result["role"] = null;
 
             // The User does not exist!
-            $this->setSuccess(-1, $result, "The user does not exist.",
-                "401 Unauthorized");
+            $this->setResponseToSuccess(
+                -1,
+                $result,
+                "The user does not exist.",
+                401);
 
         }
 
@@ -540,10 +586,11 @@ class JSONRPCServer
             $result["role"] = $user->getRole();
 
             // Successful login
-            // TODO: Set http response status
-            $this->setSuccess($this->sessionManager->getSessionID(), $result,
+            $this->setResponseToSuccess(
+                $this->sessionManager->getSessionID(),
+                $result,
                 "The user was logged in successfully.",
-                "200 OK");
+                200);
 
             // Store the User ID in the PHP session
             $this->sessionManager->set('UserID', $user->getId());
@@ -555,9 +602,11 @@ class JSONRPCServer
             $result["role"] = null;
 
             // Set success (although the user could not be authenticated).
-            $this->setSuccess(-1, $result,
+            $this->setResponseToSuccess(
+                -1,
+                $result,
                 "The user could not be logged in.",
-                "401 Unauthorized");
+                401);
         }
     }
 
@@ -578,9 +627,11 @@ class JSONRPCServer
             $result["previousId"] = -1;
 
             // The session was not active and/or no User was logged in.
-            $this->setFailure(-1, $result,
+            $this->setResponseToFailure(
+                -1,
+                $result,
                 $this->sessionManager->lastMessage(),
-                "400 Bad request");
+                400);
 
         } else {
 
@@ -592,11 +643,128 @@ class JSONRPCServer
             $this->sessionManager->destroy();
 
             // Report success
-            $this->setSuccess(-1, $result,
+            $this->setResponseToSuccess(
+                -1,
+                $result,
                 "The user was logged out successfully.",
-                "200 OK");
+                200);
         }
     }
 
+    /**
+     * Method: Add User
+     */
+    private function addUser()
+    {
+        // Prepare the result
+        $result = array("userAdded" => null);
+
+        // Check whether a User with the same name already exists
+        $user = UserQuery::create()->findOneByName($this->params["username"]);
+        if (null === $user) {
+
+            # Create user
+            $user = new User();
+
+            # Set all properties
+            $user->setName($this->params["username"]);
+            $user->setPasswordHash($this->params["password"]);
+            $user->setEmail($this->params["email"]);
+            $user->setResearchGroup($this->params["research_group"]);
+            $user->setAuthentication("integrated");
+            $user->setRole($this->params["role"]);
+            $user->setCreationDate(new \DateTime());
+            $user->setLastAccessDate(new \DateTime());
+            $user->setStatus("active");
+
+            # Save user
+            if ($user->save()) {
+
+                # Report success
+                $result["userAdded"] = true;
+                $this->setResponseToSuccess(
+                    $this->sessionManager->getSessionID(),
+                    $result,
+                    "The user was successfully added.",
+                    200);
+
+            } else {
+
+                # Report failure (server error)
+                $result["userAdded"] = false;
+                $this->setResponseToFailure(
+                    $this->sessionManager->getSessionID(),
+                    $result,
+                    "There was a problem adding the user.",
+                    500);
+
+            }
+
+        } else {
+
+            // The User already exists.
+            $result["userAdded"] = false;
+
+            # Return failure
+            $this->setResponseToFailure(
+                $this->sessionManager->getSessionID(),
+                $result,
+                "A user with this username already exists.",
+                400);
+        }
+
+    }
+
+    /**
+     * Method: Delete User
+     */
+    private function deleteUser()
+    {
+        // Prepare the result
+        $result = array("userDeleted" => null);
+
+        // Check whether a User with the given name really exists
+        $user = UserQuery::create()->findOneByName($this->params["username"]);
+        if (null === $user) {
+
+            # Return failure (server error)
+            $result["userDeleted"] = false;
+            $this->setResponseToFailure(
+                $this->sessionManager->getSessionID(),
+                $result,
+                "The requested user does not exist!",
+                500);
+
+        } else {
+
+            // Delete the user
+            if ($user->delete())
+            {
+                // The User was successfully deleted.
+                $result["userDeleted"] = true;
+
+                # Return success
+                $this->setResponseToSuccess(
+                    $this->sessionManager->getSessionID(),
+                    $result,
+                    "The user was successfully deleted.",
+                    200);
+
+            } else {
+
+                // The User could not be deleted.
+                $result["userDeleted"] = false;
+
+                # Return failure (server error)
+                $this->setResponseToFailure(
+                    $this->sessionManager->getSessionID(),
+                    $result,
+                    "The user could not be deleted!",
+                    500);
+
+            }
+        }
+
+    }
 }
 
