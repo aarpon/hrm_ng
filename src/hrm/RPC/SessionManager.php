@@ -57,7 +57,7 @@ class SessionManager
     }
 
     /**
-     * Get the value for requested key or null if the key does not exist.§
+     * Get the value for requested key or null if the key does not exist.
      * @param $key string Key
      * @return value of null.
      */
