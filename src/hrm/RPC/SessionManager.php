@@ -3,19 +3,29 @@
 namespace hrm\RPC;
 
 /**
- * Class SessionManager A SessionManager class to be bundled with JSONRPCServer.
- * @package hrm\hrm\RPC
+ * A SessionManager class to be bundled with JSONRPCServer.
+ *
+ * This class abstracts operations to the PHP session and should be used instead of
+ * PHP's session managing functions and instead of accessing the $_SESSION superglobal
+ * directly.
+ *
+ * @author Aaron Ponti
+ *
+ * @package hrm\RPC
  */
 class SessionManager
 {
     /**
-     * @var string Last (error) message.
+     * Last (error) message.
+     * @var string
      */
     private $lastMessage = "";
 
     /**
-     * Constructor
-     * @param string $sessionId. Session ID to (re)use.
+     * Constructor.
+     *
+     * Initializes both the SessionManager object and the PHP session.
+     *
      */
     public function __construct()
     {
@@ -25,7 +35,9 @@ class SessionManager
     }
 
     /**
-     * Start a new session
+     * Start a new session.
+     *
+     * The existing session is destroyed and a new one is started instead.
      */
     public function restart()
     {
@@ -47,9 +59,10 @@ class SessionManager
     }
 
     /**
-     * Set a key-value pair in the Session
-     * @param $key string Key
-     * @param $val string|int Value
+     * Set a key-value pair in the Session.
+     *
+     * @param string $key Key
+     * @param string|int $val Value
      */
     public function set($key, $val)
     {
@@ -58,8 +71,9 @@ class SessionManager
 
     /**
      * Get the value for requested key or null if the key does not exist.
-     * @param $key string Key
-     * @return value of null.
+     *
+     * @param string $key Key
+     * @return string|null Value of the requested key or null if the key does not exist.
      */
     public function get($key)
     {
@@ -67,9 +81,10 @@ class SessionManager
     }
 
     /**
-     * Delete a key-value pair
-     * @param $key string Key to be deleted.
-     * @return bool if the key-value pair could be deleted, false otherwise.
+     * Delete a key-value pair.
+     *
+     * @param string $key Key to be deleted.
+     * @return bool True if the key-value pair could be deleted, false otherwise.
      */
     public function delete($key)
     {
@@ -82,7 +97,15 @@ class SessionManager
 
     /**
      * Return the active status of the session.
-     * @param $clientSessionId Session ID as passed by the client.
+     *
+     * The session is active if:
+     *
+     * 1. the session id passed by the client matches the session id stored
+     *    in the session object;
+     * 2. a user id is stored in the session as well (i.e. a user successfully
+     *    authenticated).
+     *
+     * @param string $clientSessionId Session ID as passed by the client.
      * @return bool True if the session is active, false otherwise.
      */
     public function isActive($clientSessionId)
@@ -107,15 +130,24 @@ class SessionManager
 
     /**
      * Get current session ID.
-     * @return string Session ID.
+     *
+     * Return the session ID or -1 if no session exists.
+     *
+     * @return string|int Session ID.
      */
     public function getSessionID()
     {
-        return session_id();
+        $id = session_id();
+        if ($id == "") {
+            $id = -1;
+        }
+
+        return $id;
     }
 
     /**
      * Return the last message.
+     *
      * @return string The last message.
      */
     public function lastMessage()

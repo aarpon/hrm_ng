@@ -8,7 +8,7 @@
 #
 #    --public: only document public methods and attributes
 
-if [ $1 = "--public" ] ; then
+if [ "$1" = "--public" ] ; then
     levels="public"
     echo "Building public API..."
     dest="./api/public"
@@ -18,11 +18,10 @@ else
     dest="./api/private"
 fi
 
-../vendor/bin/apigen generate \
-                        --source ../src/hrm/ \
-                        --destination ${dest} \
-                        --exclude=Base/*,Map/*,Param/*,Template/*,User/Base/*,User/Map/* \
-                        --tree \
-                        --no-source-code \
-                        --access-levels=${levels} \
-                        --template-theme=bootstrap
+../vendor/bin/phpdoc -d ../src/hrm/ \
+                     -t ${dest} \
+                     --ignore "*/Base/*,*/Map/*,/Param/*,/Template/*" \
+                     --visibility=${levels} \
+                     --template="clean"
+
+# Alternative template: responsive-twig
