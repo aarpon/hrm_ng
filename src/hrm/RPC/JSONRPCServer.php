@@ -178,7 +178,7 @@ class JSONRPCServer
 
     /**
      * HTTP response content.
-     * @var Array $httpResponseArray
+     * @var array $httpResponseArray
      */
     private $httpResponseArray = array(
         "id" => -1,
@@ -195,7 +195,7 @@ class JSONRPCServer
 
     /**
      * JSON RPC request sent from the client (converted to a PHP array).
-     * @var Array $httpRequest
+     * @var array $httpRequest
      */
     private $httpRequest = null;
 
@@ -308,7 +308,7 @@ class JSONRPCServer
      * SessionManager member.
      *
      * @see \hrm\RPC\SessionManager
-     * @param Array $request JSON RPC request from the client converted to
+     * @param array $request JSON RPC request from the client converted to
      * a PHP array.
      */
     public function __construct(array $request)
@@ -746,11 +746,11 @@ class JSONRPCServer
      * the result of the login attempt will be negative.
      *
      * @param string|integer $id Session ID
-     * @param Array $result Result from the method call.
+     * @param array $result Result from the method call.
      * @param string $message Message returned by the method call.
      * @param int $responseCode HTTP/1.1 response status. Default for
      *               success is 200.
-     * @return Array JSON object.
+     * @return array JSON object.
      */
     private function setResponseToSuccess($id, $result = array(), $message = "",
                                           $responseCode = 200)
@@ -773,11 +773,11 @@ class JSONRPCServer
      * method call.
      *
      * @param string|integer $id Session ID
-     * @param Array $result Result from the method call.
+     * @param array $result Result from the method call.
      * @param string $message Message returned by the method call.
      * @param int $responseCode HTTP/1.1 response status. Default for
      *               failure is 400.
-     * @return Array JSON object.
+     * @return array JSON object.
      */
     private function setResponseToFailure($id, $result = array(), $message = "",
                                   $responseCode = 400)
@@ -1242,8 +1242,13 @@ class JSONRPCServer
         } else {
 
             // Delete the user
-            if ($user->delete())
-            {
+            try {
+
+                // The delete() function does not return anything.
+                // It just throws an exception if the user was
+                // already deleted.
+                $user->delete();
+
                 // The User was successfully deleted.
                 $result["userDeleted"] = true;
 
@@ -1254,7 +1259,7 @@ class JSONRPCServer
                     "The user was successfully deleted.",
                     200);
 
-            } else {
+            } catch (PropelException $e) {
 
                 // The User could not be deleted.
                 $result["userDeleted"] = false;
