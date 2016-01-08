@@ -81,10 +81,19 @@ class LDAPAuthenticator extends AbstractAuthenticator {
     private $m_LDAP_Manager_OU;
 
     /**
-     * @var Array $m_LDAP_Valid_Groups Array of valid groups to be used to
-     * filter the groups to which the user belongs,
+     * @var \array $m_LDAP_Valid_Groups Array of valid groups to be used to
+     * filter the groups to which the user belongs.
      */
     private $m_LDAP_Valid_Groups;
+
+    /**
+     * @var \array Array of authorized groups
+     *
+     * If $m_AuthorizedGroups is not empty, the groups array returned by
+     * adLDAP->user_groups will be intersected with $m_AuthorizedGroups.
+     * If the intersection is empty, the user will not be allowed to log in.
+     */
+    private $m_LDAP_Authorized_Groups;
 
     /**
      * Constructor: instantiates an LDAPAuthenticator object with the settings
@@ -109,7 +118,15 @@ class LDAPAuthenticator extends AbstractAuthenticator {
         $this->m_LDAP_Password = $LDAP_CONFIG['ldap_password'];
         $this->m_LDAP_User_Search_DN = $LDAP_CONFIG['ldap_user_search_DN'];
         $this->m_LDAP_Manager_OU = $LDAP_CONFIG['ldap_manager_ou'];
-        $this->m_LDAP_Valid_Groups = $LDAP_CONFIG['ldap_valid_groups'];
+
+        // Check group filters
+        if (count($LDAP_CONFIG['valid_groups']) == 0 &&
+            count($LDAP_CONFIG['authorized_groups']) > 0) {
+            // Copy the array
+            $LDAP_CONFIG['valid_groups'] = $LDAP_CONFIG['authorized_groups'];
+        }
+        $this->m_LDAP_Valid_Groups =  $LDAP_CONFIG['valid_groups'];
+        $this->m_LDAP_Authorized_Groups =  $LDAP_CONFIG['authorized_groups'];
 
         // Set the connection to null
         $this->m_Connection = null;
@@ -231,30 +248,52 @@ class LDAPAuthenticator extends AbstractAuthenticator {
         $filter = "(uid=" . $uid . ")";
         $searchbase = $this->searchbaseStr();
         $sr = @ldap_search(
-                $this->m_Connection, $searchbase, $filter, array('uid'));
+            $this->m_Connection, $searchbase, $filter, array('uid', 'memberof'));
         if (!$sr) {
             $HRM_LOGGER->error("Authenticate -- search failed! " .
-                    "Search base: \"$searchbase\"");
+                "Search base: \"$searchbase\"");
             return false;
         }
         if (@ldap_count_entries($this->m_Connection, $sr) != 1) {
+            $HRM_LOGGER->error("Authenticate -- user not found!");
             return false;
         }
 
         // Now we try to bind with the found dn
         $result = @ldap_get_entries($this->m_Connection, $sr);
         if ($result[0]) {
-            if (@ldap_bind($this->m_Connection,
-                    $result[0]['dn'], $userPassword)
-            ) {
-                return true;
-            } else {
-                // Wrong password
+
+            // If this succeeds, the user is authenticated
+            $b = @ldap_bind($this->m_Connection, $result[0]['dn'], $userPassword);
+
+            // If authentication failed, we can return here.
+            if ($b === false) {
                 return false;
             }
-        } else {
+
+            // If it succeeded, fo we need to check for group authorization?
+            if (count($this->m_LDAP_Authorized_Groups) == 0) {
+                // No, we don't
+                return $b;
+            }
+
+            // Test whether at least one of the user groups is contained in
+            // the list of authorize groups.
+            $groups = $result[0]["memberof"];
+            for ($i = 0; $i < count($groups); $i++) {
+                for ($j = 0; $j < count($this->m_LDAP_Authorized_Groups); $j++) {
+                    if (strpos($groups[$i], $this->m_LDAP_Authorized_Groups[$j])) {
+                        $HRM_LOGGER->info("User $uid: group authentication succeeded.");
+                        return true;
+                    }
+                }
+            }
+
+            // Not found
+            $HRM_LOGGER->info("User $uid: user rejected by failed group authentication.");
             return false;
         }
+        return false;
     }
 
     /**
@@ -296,6 +335,7 @@ class LDAPAuthenticator extends AbstractAuthenticator {
             if (count($groups) == 0) {
                 return "";
             }
+            // Return the first group
             $groups = $groups[0];
             // Remove ou= or cn= entries
             $matches = array();

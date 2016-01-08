@@ -6,7 +6,7 @@ namespace hrm\User\Auth;
 use adLDAP\adLDAP;
 use adLDAP\adLDAPException;
 
-require_once dirname(__FILE__) . '/../../../../bootstrap.php';
+require_once dirname(__FILE__) . '/../../../bootstrap.php';
 
 /**
  * Class ActiveDirectoryAuthenticator
@@ -29,25 +29,23 @@ class ActiveDirectoryAuthenticator extends AbstractAuthenticator {
     private $m_AdLDAP;
 
     /**
-     * @var Integer Index (level) of the group to consider
+     * @var \array Array of valid groups
      *
-     * Users usually belong to several groups, m_GroupIndex defines which
-     * level of the hierarchy to consider. If $m_GroupIndex is -1 and the
-     * $m_ValidGroups array is empty, ActiveDirectoryAuthenticator::getGroup()
-     * will return an array with all groups.
-     */
-    private $m_GroupIndex;
-
-    /**
-     * @var Array Array of valid groups
-     *
-     * If $m_GroupIndex is set to -1 and $m_ValidGroups is not empty,
-     * the groups array returned by adLDAP->user_groups will be compared
-     * with $m_ValidGroups and only the first group in the intersection
-     * will be returned (ideally, the intersection should contain only
-     * one group).
+     * If $m_ValidGroups is not empty, the groups array returned by
+     * adLDAP->user_groups will be compared with $m_ValidGroups and
+     * only the first group in the intersection will be returned
+     * (ideally, the intersection should contain only one group).
      */
     private $m_ValidGroups;
+
+    /**
+     * @var \array Array of authorized groups
+     *
+     * If $m_AuthorizedGroups is not empty, the groups array returned by
+     * adLDAP->user_groups will be intersected with $m_AuthorizedGroups.
+     * If the intersection is empty, the user will not be allowed to log in.
+     */
+    private $m_AuthorizedGroups;
 
     /**
      * @var string FQDN of the root domain (with a leading dot)
@@ -95,15 +93,24 @@ class ActiveDirectoryAuthenticator extends AbstractAuthenticator {
                 'use_tls'            => $ACTIVE_DIR_CONF['use_tls'],
                 'recursive_groups'   => $ACTIVE_DIR_CONF['recursive_groups']);
 
-        $this->m_GroupIndex      =  $ACTIVE_DIR_CONF['group_index'];
-        $this->m_ValidGroups     =  $ACTIVE_DIR_CONF['valid_groups'];
+         // Check group filters
+        if (count($ACTIVE_DIR_CONF['valid_groups']) == 0 &&
+            count($ACTIVE_DIR_CONF['authorized_groups']) > 0) {
+            // Copy the array
+            $ACTIVE_DIR_CONF['valid_groups'] =
+                $ACTIVE_DIR_CONF['authorized_groups'];
+        }
+        $this->m_ValidGroups      =  $ACTIVE_DIR_CONF['valid_groups'];
+        $this->m_AuthorizedGroups =  $ACTIVE_DIR_CONF['authorized_groups'];
 
+        // Handling of domain forests
         $this->m_UsernameSuffix = $ACTIVE_DIR_CONF['ad_username_suffix'];
         $this->m_UsernameSuffixReplaceMatch =
                 $ACTIVE_DIR_CONF['ad_username_suffix_pattern'];
         $this->m_UsernameSuffixReplaceString =
                 $ACTIVE_DIR_CONF['ad_username_suffix_replace'];
 
+        // Instantiate adLDAP object
         try {
             $this->m_AdLDAP = new adLDAP($options);
         } catch (adLDAPException $e) {
@@ -140,14 +147,53 @@ class ActiveDirectoryAuthenticator extends AbstractAuthenticator {
      */
     public function authenticate($username, $password) {
 
+        /** @var \Monolog\Logger The global HRM logger. */
+        global $HRM_LOGGER;
+
         // Make sure the user is active
         if (!$this->isActive($username)) {
             return false;
         }
+
         // Authenticate against AD
         $b = $this->m_AdLDAP->user()->authenticate(
-                strtolower($username), $password);
+            strtolower($username), $password);
+
+        // If authentication failed, we can return here.
+        if ($b === false) {
+            $this->m_AdLDAP->close();
+            return false;
+        }
+
+        // If if succeeded, do we need to check for group authorization?
+        if (count($this->m_AuthorizedGroups) == 0) {
+            // No, we don't.
+            return true;
+        }
+
+        // We need to retrieve the groups and compare them.
+
+        // If needed, process the user name suffix for subdomains
+        $username .= $this->m_UsernameSuffix;
+        if ($this->m_UsernameSuffixReplaceMatch != '') {
+            $pattern = "/$this->m_UsernameSuffixReplaceMatch/";
+            $username = preg_replace($pattern,
+                $this->m_UsernameSuffixReplaceString,
+                $username);
+        }
+
+        // Get the user groups from AD
+        $userGroups = $this->m_AdLDAP->user()->groups($username);
         $this->m_AdLDAP->close();
+
+        // Test for intersection
+        $b = count(array_intersect($userGroups, $this->m_AuthorizedGroups)) > 0;
+        if ($b === true) {
+            $HRM_LOGGER->info("User $username: group authentication succeeded.");
+        } else {
+            $HRM_LOGGER->info("User $username: user rejected by failed group " .
+                "authentication.");
+        }
         return $b;
     }
 
@@ -162,7 +208,7 @@ class ActiveDirectoryAuthenticator extends AbstractAuthenticator {
         /** @var \Monolog\Logger The global HRM logger. */
         global $HRM_LOGGER;
 
-        // If needed, process the user name suffix for subdomains
+        // If needed, process the user name suffix for sub-domains
         $username .= $this->m_UsernameSuffix;
         if ($this->m_UsernameSuffixReplaceMatch != '') {
             $pattern = "/$this->m_UsernameSuffixReplaceMatch/";
@@ -181,7 +227,7 @@ class ActiveDirectoryAuthenticator extends AbstractAuthenticator {
                     $username . '"');
             return "";
         }
-        $HRM_LOGGER->info('Email for username "' . $username . '": ' . $info->mail);
+        $HRM_LOGGER->info("Email for username $username: $info->mail.");
         return $info->mail;
     }
 
@@ -201,8 +247,8 @@ class ActiveDirectoryAuthenticator extends AbstractAuthenticator {
         if ($this->m_UsernameSuffixReplaceMatch != '') {
             $pattern = "/$this->m_UsernameSuffixReplaceMatch/";
             $username = preg_replace($pattern,
-                    $this->m_UsernameSuffixReplaceString,
-                    $username);
+                $this->m_UsernameSuffixReplaceString,
+                $username);
         }
 
         // Get the user groups from AD
@@ -211,7 +257,7 @@ class ActiveDirectoryAuthenticator extends AbstractAuthenticator {
 
         // If no groups found, return ""
         if (!$userGroups) {
-            $HRM_LOGGER->warning('No groups found for username "' . $username . '"');
+            $HRM_LOGGER->warning("No groups found for username $username.");
             return "";
         }
 
@@ -225,19 +271,19 @@ class ActiveDirectoryAuthenticator extends AbstractAuthenticator {
         // original array.
         if (count($this->m_ValidGroups) > 0) {
             $userGroups = array_values(array_intersect(
-                    $userGroups, $this->m_ValidGroups));
+                $userGroups, $this->m_ValidGroups));
         }
 
-        // If an explicit index is set in the configuration file, return the
-        // group at that position; otherwise, just return the first entry in
-        // the (filtered or original) group array.
-        if ($this->m_GroupIndex >= 0 &&
-                $this->m_GroupIndex < count($userGroups)) {
-            $group = $userGroups[$this->m_GroupIndex];
+        // Now return the first entry
+        if (count($userGroups) == 0) {
+            $HRM_LOGGER->warning("Group for username $username not found " .
+             "in the list of valid groups!");
+            $group = "";
         } else {
             $group = $userGroups[0];
         }
-        $HRM_LOGGER->warning('Group for username "' . $username . '": ' . $group);
+
+        $HRM_LOGGER->info("Group for username $username: $group.");
         return $group;
 
     }
