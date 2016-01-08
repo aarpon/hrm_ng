@@ -347,8 +347,6 @@ class JSONRPCServer
      * ```
      *
      * HTTP response code: ``405 Method Not Allowed``
-     *
-     *
      */
     public function executeRequest()
     {
