@@ -26,65 +26,65 @@ class LDAPAuthenticator extends AbstractAuthenticator {
     private $m_Connection;
 
     /**
-     * @var string $m_LDAP_Host LDAP host name
+     * @var string $m_Host LDAP host name
      */
-    private $m_LDAP_Host;
+    private $m_Host;
 
     /**
-     * @var Integer $m_LDAP_Port LDAP port
+     * @var Integer $m_Port LDAP port
      */
-    private $m_LDAP_Port;
+    private $m_Port;
 
     /**
-     * @var bool $m_LDAP_Use_SSL Set to true to use SSL (LDAPS)
+     * @var bool $m_Use_SSL Set to true to use SSL (LDAPS)
      */
-    private $m_LDAP_Use_SSL;
+    private $m_Use_SSL;
 
     /**
-     * @var bool $m_LDAP_Use_TLS Set to true to use TSL
+     * @var bool $m_Use_TLS Set to true to use TSL
      *
-     * If you wish to use TLS you should ensure that $m_LDAP_Use_SSL is
+     * If you wish to use TLS you should ensure that $m_Use_SSL is
      * set to false and vice-versa
      */
-    private $m_LDAP_Use_TLS;
+    private $m_Use_TLS;
 
     /**
-     * @var string $m_LDAP_Root LDAP root
+     * @var string $m_Root LDAP root
      */
-    private $m_LDAP_Root;
+    private $m_Root;
 
     /**
-     * @var string $m_LDAP_Manager_Base_DN Base for the manager DN
+     * @var string $m_Manager_Base_DN Base for the manager DN
      */
-    private $m_LDAP_Manager_Base_DN;
+    private $m_Manager_Base_DN;
 
     /**
-     * @var string $m_LDAP_Manager The LDAP manager (user name only!)
+     * @var string $m_Manager The LDAP manager (user name only!)
      */
-    private $m_LDAP_Manager;
+    private $m_Manager;
 
     /**
-     * @var string $m_LDAP_Password The ldap password
+     * @var string $m_Password The ldap password
      */
-    private $m_LDAP_Password;
+    private $m_Password;
 
     /**
-     * @var string $m_LDAP_User_Search_DN User search DN (without ldap root)
+     * @var string $m_User_Search_DN User search DN (without ldap root)
      */
-    private $m_LDAP_User_Search_DN;
+    private $m_User_Search_DN;
 
     /**
-     * @var string $m_LDAP_Manager_OU LDAPAuthenticator manager OU: used
+     * @var string $m_Manager_OU LDAPAuthenticator manager OU: used
      * in case the Ldap_Manager is in some special OU that distinguishes
      * it from the other users.
      */
-    private $m_LDAP_Manager_OU;
+    private $m_Manager_OU;
 
     /**
-     * @var \array $m_LDAP_Valid_Groups Array of valid groups to be used to
+     * @var \array $m_Valid_Groups Array of valid groups to be used to
      * filter the groups to which the user belongs.
      */
-    private $m_LDAP_Valid_Groups;
+    private $m_Valid_Groups;
 
     /**
      * @var \array Array of authorized groups
@@ -93,7 +93,7 @@ class LDAPAuthenticator extends AbstractAuthenticator {
      * adLDAP->user_groups will be intersected with $m_AuthorizedGroups.
      * If the intersection is empty, the user will not be allowed to log in.
      */
-    private $m_LDAP_Authorized_Groups;
+    private $m_Authorized_Groups;
 
     /**
      * Constructor: instantiates an LDAPAuthenticator object with the settings
@@ -108,16 +108,16 @@ class LDAPAuthenticator extends AbstractAuthenticator {
         include(dirname(__FILE__) . "/../../../../config/auth//ldap_config.inc");
 
         // Assign the variables
-        $this->m_LDAP_Host = $LDAP_CONFIG['ldap_host'];
-        $this->m_LDAP_Port = $LDAP_CONFIG['ldap_port'];
-        $this->m_LDAP_Use_SSL = $LDAP_CONFIG['ldap_use_ssl'];
-        $this->m_LDAP_Use_TLS = $LDAP_CONFIG['ldap_use_tls'];
-        $this->m_LDAP_Root = $LDAP_CONFIG['ldap_root'];
-        $this->m_LDAP_Manager_Base_DN = $LDAP_CONFIG['ldap_manager_base_DN'];
-        $this->m_LDAP_Manager = $LDAP_CONFIG['ldap_manager'];
-        $this->m_LDAP_Password = $LDAP_CONFIG['ldap_password'];
-        $this->m_LDAP_User_Search_DN = $LDAP_CONFIG['ldap_user_search_DN'];
-        $this->m_LDAP_Manager_OU = $LDAP_CONFIG['ldap_manager_ou'];
+        $this->m_Host = $LDAP_CONFIG['ldap_host'];
+        $this->m_Port = $LDAP_CONFIG['port'] ;
+        $this->m_Use_SSL = $LDAP_CONFIG['use_ssl'] ;
+        $this->m_Use_TLS = $LDAP_CONFIG['use_tls'] ;
+        $this->m_Root = $LDAP_CONFIG['root'] ;
+        $this->m_Manager_Base_DN = $LDAP_CONFIG['manager_base_DN'] ;
+        $this->m_Manager = $LDAP_CONFIG['manager'] ;
+        $this->m_Password = $LDAP_CONFIG['password'] ;
+        $this->m_User_Search_DN = $LDAP_CONFIG['user_search_DN'] ;
+        $this->m_Manager_OU = $LDAP_CONFIG['manager_ou'] ;
 
         // Check group filters
         if (count($LDAP_CONFIG['valid_groups']) == 0 &&
@@ -125,18 +125,18 @@ class LDAPAuthenticator extends AbstractAuthenticator {
             // Copy the array
             $LDAP_CONFIG['valid_groups'] = $LDAP_CONFIG['authorized_groups'];
         }
-        $this->m_LDAP_Valid_Groups =  $LDAP_CONFIG['valid_groups'];
-        $this->m_LDAP_Authorized_Groups =  $LDAP_CONFIG['authorized_groups'];
+        $this->m_Valid_Groups =  $LDAP_CONFIG['valid_groups'];
+        $this->m_Authorized_Groups =  $LDAP_CONFIG['authorized_groups'];
 
         // Set the connection to null
         $this->m_Connection = null;
 
         // Connect
-        if ($this->m_LDAP_Use_SSL == true) {
+        if ($this->m_Use_SSL == true) {
             $ds = @ldap_connect(
-                    "ldaps://" . $this->m_LDAP_Host, $this->m_LDAP_Port);
+                    "ldaps://" . $this->m_Host, $this->m_Port);
         } else {
-            $ds = @ldap_connect($this->m_LDAP_Host, $this->m_LDAP_Port);
+            $ds = @ldap_connect($this->m_Host, $this->m_Port);
         }
 
         if ($ds) {
@@ -150,7 +150,7 @@ class LDAPAuthenticator extends AbstractAuthenticator {
                 $HRM_LOGGER->error("Could not set LDAP protocol version to 3.");
             }
 
-            if ($this->m_LDAP_Use_TLS) {
+            if ($this->m_Use_TLS) {
                 if (!ldap_start_tls($ds)) {
                     $HRM_LOGGER->error("Could not activate TLS.");
                 }
@@ -158,7 +158,7 @@ class LDAPAuthenticator extends AbstractAuthenticator {
 
         } else {
 
-            $HRM_LOGGER->error("Could not connect to $this->m_LDAP_Host.");
+            $HRM_LOGGER->error("Could not connect to $this->m_Host.");
         }
     }
 
@@ -272,7 +272,7 @@ class LDAPAuthenticator extends AbstractAuthenticator {
             }
 
             // If it succeeded, fo we need to check for group authorization?
-            if (count($this->m_LDAP_Authorized_Groups) == 0) {
+            if (count($this->m_Authorized_Groups) == 0) {
                 // No, we don't
                 return $b;
             }
@@ -281,8 +281,8 @@ class LDAPAuthenticator extends AbstractAuthenticator {
             // the list of authorize groups.
             $groups = $result[0]["memberof"];
             for ($i = 0; $i < count($groups); $i++) {
-                for ($j = 0; $j < count($this->m_LDAP_Authorized_Groups); $j++) {
-                    if (strpos($groups[$i], $this->m_LDAP_Authorized_Groups[$j])) {
+                for ($j = 0; $j < count($this->m_Authorized_Groups); $j++) {
+                    if (strpos($groups[$i], $this->m_Authorized_Groups[$j])) {
                         $HRM_LOGGER->info("User $uid: group authentication succeeded.");
                         return true;
                     }
@@ -326,7 +326,7 @@ class LDAPAuthenticator extends AbstractAuthenticator {
         $groups = $info[0]["memberof"];
 
         // Filter by valid groups?
-        if (count($this->m_LDAP_Valid_Groups) == 0) {
+        if (count($this->m_Valid_Groups) == 0) {
 
             // The configuration did not specify any valid groups
             $groups = array_diff(
@@ -351,9 +351,9 @@ class LDAPAuthenticator extends AbstractAuthenticator {
 
             // The configuration contains a list of valid groups
             for ($i = 0; $i < count($groups); $i++) {
-                for ($j = 0; $j < count($this->m_LDAP_Valid_Groups); $j++) {
-                    if (strpos($groups[$i], $this->m_LDAP_Valid_Groups[$j])) {
-                        return ($this->m_LDAP_Valid_Groups[$j]);
+                for ($j = 0; $j < count($this->m_Valid_Groups); $j++) {
+                    if (strpos($groups[$i], $this->m_Valid_Groups[$j])) {
+                        return ($this->m_Valid_Groups[$j]);
                     }
                 }
             }
@@ -400,7 +400,7 @@ class LDAPAuthenticator extends AbstractAuthenticator {
         $dn = $this->dnStr();
 
         // Bind
-        $r = @ldap_bind($this->m_Connection, $dn, $this->m_LDAP_Password);
+        $r = @ldap_bind($this->m_Connection, $dn, $this->m_Password);
         if ($r) {
             return true;
         }
@@ -417,7 +417,7 @@ class LDAPAuthenticator extends AbstractAuthenticator {
      * @return string Search base string
      */
     private function searchbaseStr() {
-        return ($this->m_LDAP_User_Search_DN . "," . $this->m_LDAP_Root);
+        return ($this->m_User_Search_DN . "," . $this->m_Root);
     }
 
     /**
@@ -426,12 +426,12 @@ class LDAPAuthenticator extends AbstractAuthenticator {
      * @return string DN string
      */
     private function dnStr() {
-        $dn = $this->m_LDAP_Manager_Base_DN . "=" .
-                $this->m_LDAP_Manager . "," .
-                $this->m_LDAP_Manager_OU . "," .
-                $this->m_LDAP_User_Search_DN . "," .
-                $this->m_LDAP_Root;
-        // Since m_LDAP_Manager_OU can be empty, we make sure not
+        $dn = $this->m_Manager_Base_DN . "=" .
+                $this->m_Manager . "," .
+                $this->m_Manager_OU . "," .
+                $this->m_User_Search_DN . "," .
+                $this->m_Root;
+        // Since m_Manager_OU can be empty, we make sure not
         // to have double commas
         $dn = str_replace(',,', ',', $dn);
         return $dn;
