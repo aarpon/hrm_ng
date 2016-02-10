@@ -16,11 +16,11 @@
   "require": {
     "php": ">7.0.0",
     "propel/propel": "~2.0@dev",
-    "adldap/adldap": "4.0.2",
-    "monolog/monolog": "1.14.0"
+    "adldap/adldap": "5.0.0.x-dev",
+    "monolog/monolog": "1.17.2"
   },
   "require-dev": {
-    "phpunit/phpunit": "4.7.5",
+    "phpunit/phpunit": "5.2",
     "phpdocumentor/phpdocumentor": "2.8.5"
   },
   "autoload": {
