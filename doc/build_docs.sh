@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# Please note: apugen requires sqlite; install with
-#
-# sudo apt-get install php5-sqlite
-#
 # Usage: build_docs [--public]
 #
 #    --public: only document public methods and attributes
