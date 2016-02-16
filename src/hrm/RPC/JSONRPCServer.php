@@ -3,6 +3,7 @@
 namespace hrm\RPC;
 use hrm\User\Base\UserQuery;
 use hrm\User\User;
+use Propel\Runtime\Exception\PropelException;
 
 require_once dirname(__FILE__) . '/../../bootstrap.php';
 
@@ -929,7 +930,7 @@ class JSONRPCServer
 
     /**
      * Method: User log out
-     * 
+     *
      * <b>Minimum role</b>
      *
      * ``user``
