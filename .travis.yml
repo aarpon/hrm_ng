@@ -3,9 +3,13 @@ language: php
 php:
   - '7.0'
 
+services:
+  - mysql
+
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y php7.0-ldap php7.0-mysql php7.0-pgsql
+  - sudo apt-get install -y php7.0-ldap
+  - mysql -e "create database IF NOT EXISTS hrm_ng;" -uroot
 
 before_script:
   - phpenv config-rm xdebug.ini
