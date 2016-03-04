@@ -3,7 +3,11 @@ language: php
 php:
   - '7.0'
 
-install: ./setup/setup.sh
+before_script:
+  - phpenv config-rm xdebug.ini
+  - composer install
+
+script: phpunit --configuration phpunit.xml
 
 
 
