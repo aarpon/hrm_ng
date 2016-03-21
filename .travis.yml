@@ -8,11 +8,12 @@ services:
 
 before_install:
   - sudo apt-get -qq update
-  - sudo apt-get install -y php7.0-ldap
+  - sudo pear install Net_LDAP2
   - mysql -e "create database IF NOT EXISTS hrm_ng;" -uroot
 
 before_script:
   - phpenv config-rm xdebug.ini
+  - composer self-update
   - composer install
 
 script: phpunit --configuration phpunit.xml
